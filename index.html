@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>Mindful Eating Coach</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        input, textarea, select { font-size: 16px !important; }
+        button { min-height: 44px; }
+        html { scroll-behavior: smooth; }
+        .overflow-y-auto::-webkit-scrollbar { width: 4px; }
+        .overflow-y-auto::-webkit-scrollbar-track { background: transparent; }
+        .overflow-y-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        // Simple icon replacements
+        const Bell = ({ className }) => React.createElement('span', { className }, '🔔');
+        const Heart = ({ className }) => React.createElement('span', { className }, '❤️');
+        const Clock = ({ className }) => React.createElement('span', { className }, '⏰');
+        const CheckCircle = ({ className }) => React.createElement('span', { className }, '✅');
+        const AlertCircle = ({ className }) => React.createElement('span', { className }, '⚠️');
+        const Lightbulb = ({ className }) => React.createElement('span', { className }, '💡');
+        const Home = ({ className }) => React.createElement('span', { className }, '🏠');
+        const Menu = ({ className }) => React.createElement('span', { className }, '☰');
+        const X = ({ className }) => React.createElement('span', { className }, '✕');
+        const BarChart = ({ className }) => React.createElement('span', { className }, '📊');
+
+        const MindfulEatingCoach = () => {
+            const [currentView, setCurrentView] = React.useState('home');
+            const [hungerLevel, setHungerLevel] = React.useState(null);
+            const [notifications, setNotifications] = React.useState([]);
+            const [isEating, setIsEating] = React.useState(false);
+            const [eatingStartTime, setEatingStartTime] = React.useState(null);
+            const [currentQuestion, setCurrentQuestion] = React.useState(0);
+            const [eatingResponses, setEatingResponses] = React.useState([]);
+            const [currentResponse, setCurrentResponse] = React.useState('');
+            const [eatingNote, setEatingNote] = React.useState('');
+            const [cravingLog, setCravingLog] = React.useState([]);
+            const [currentCravingData, setCurrentCravingData] = React.useState({
+                timestamp: null,
+                food: '',
+                emotions: [],
+                intensity: null,
+                triggers: [],
+                outcome: ''
+            });
+            const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+            const [installPrompt, setInstallPrompt] = React.useState(null);
+
+            // Load data from localStorage on startup
+            React.useEffect(() => {
+                const savedCravingLog = localStorage.getItem('mindfulEating_cravingLog');
+                if (savedCravingLog) {
+                    setCravingLog(JSON.parse(savedCravingLog));
+                }
+            }, []);
+
+            // Save craving log to localStorage whenever it changes
+            React.useEffect(() => {
+                localStorage.setItem('mindfulEating_cravingLog', JSON.stringify(cravingLog));
+            }, [cravingLog]);
+
+            // Request notification permission
+            React.useEffect(() => {
+                if ('Notification' in window) {
+                    Notification.requestPermission();
+                }
+            }, []);
+
+            // Data arrays
+            const distractionActivities = [
+                "Take 5 deep breaths",
+                "Drink a glass of water",
+                "Go for a 2-minute walk",
+                "Listen to your favorite song",
+                "Do 10 jumping jacks",
+                "Text a friend",
+                "Write in a journal",
+                "Do a quick stretch",
+                "Look out the window",
+                "Practice gratitude - think of 3 things you're thankful for",
+                "Organize your desk or a small space",
+                "Take a few photos of something beautiful nearby"
+            ];
+
+            const mindfulEatingPrompts = [
+                {
+                    text: "Take a moment to look at your food. Notice the colors, textures, and presentation.",
+                    responseType: "observation",
+                    placeholder: "What do you notice about your food?"
+                },
+                {
+                    text: "Take your first bite slowly. Chew thoroughly and notice the flavors.",
+                    responseType: "taste",
+                    placeholder: "How does it taste? What flavors do you notice?"
+                },
+                {
+                    text: "Put your utensils down between bites. How are you feeling?",
+                    responseType: "feeling",
+                    placeholder: "How are you feeling right now?"
+                },
+                {
+                    text: "Check in with your hunger level now. Are you still hungry?",
+                    responseType: "hunger",
+                    options: ["Very hungry", "Moderately hungry", "Slightly hungry", "Not hungry", "Getting full"]
+                },
+                {
+                    text: "Notice how your body feels. Are you getting satisfied?",
+                    responseType: "satisfaction",
+                    options: ["Still very hungry", "Still hungry", "Starting to feel satisfied", "Feeling satisfied", "Getting full"]
+                },
+                {
+                    text: "Take a sip of water. How does your body feel now?",
+                    responseType: "body",
+                    placeholder: "How does your body feel after the water?"
+                },
+                {
+                    text: "You're doing great! Keep eating slowly and mindfully.",
+                    responseType: "reflection",
+                    placeholder: "How is this mindful eating experience going for you?"
+                },
+                {
+                    text: "Final check: How satisfied do you feel right now?",
+                    responseType: "final",
+                    options: ["Still hungry", "Slightly satisfied", "Comfortably satisfied", "Very satisfied", "Too full"]
+                }
+            ];
+
+            const cravingQuestions = [
+                {
+                    question: "What are you craving specifically?",
+                    type: "food",
+                    options: ["Something sweet (candy, dessert)", "Something salty/crunchy (chips, crackers)", "Something creamy/rich (ice cream, cheese)", "Comfort food (pizza, pasta)", "A full meal", "Other"],
+                    insight: "Specific cravings often reveal emotional needs rather than hunger."
+                },
+                {
+                    question: "How intense is this craving right now?",
+                    type: "intensity", 
+                    options: ["1 - Mild", "2 - Moderate", "3 - Strong", "4 - Very strong", "5 - Overwhelming"],
+                    insight: "Intense cravings are more likely to be emotional rather than physical."
+                },
+                {
+                    question: "What emotions are you feeling right now? (Select all that apply)",
+                    type: "emotions",
+                    multiSelect: true,
+                    options: ["Stressed", "Anxious", "Bored", "Sad", "Lonely", "Tired", "Frustrated", "Happy", "Excited", "Overwhelmed", "Angry", "Neutral"],
+                    insight: "Identifying emotions helps recognize patterns in emotional eating."
+                },
+                {
+                    question: "When did you last eat a full meal?",
+                    type: "timing",
+                    options: ["Less than 2 hours ago", "2-4 hours ago", "4-6 hours ago", "More than 6 hours ago"],
+                    insight: "If it's been more than 4 hours, this might be real hunger!"
+                },
+                {
+                    question: "What might have triggered this craving? (Select all that apply)",
+                    type: "triggers",
+                    multiSelect: true,
+                    options: ["Saw food/ad", "Smelled food", "Work stress", "Relationship issue", "Fatigue", "Habit/routine", "Social situation", "Physical discomfort", "Nothing specific"],
+                    insight: "Understanding triggers helps you prepare for and manage future cravings."
+                }
+            ];
+
+            // Helper functions
+            const scheduleReminder = (minutes, message) => {
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    setTimeout(() => {
+                        new Notification('Mindful Eating Coach', {
+                            body: message,
+                            icon: '🍽️'
+                        });
+                    }, minutes * 60 * 1000);
+                }
+            };
+
+            const getRandomActivities = () => {
+                return distractionActivities
+                    .sort(() => Math.random() - 0.5)
+                    .slice(0, 4);
+            };
+
+            const getTimeOfDay = (date) => {
+                const hour = date.getHours();
+                if (hour < 6) return 'Late Night';
+                if (hour < 12) return 'Morning';
+                if (hour < 17) return 'Afternoon';
+                if (hour < 21) return 'Evening';
+                return 'Night';
+            };
+
+            const getCravingsByTimeOfDay = () => {
+                const timeGroups = {};
+                cravingLog.forEach(entry => {
+                    const timeOfDay = getTimeOfDay(new Date(entry.timestamp));
+                    if (!timeGroups[timeOfDay]) {
+                        timeGroups[timeOfDay] = [];
+                    }
+                    timeGroups[timeOfDay].push(entry);
+                });
+                return timeGroups;
+            };
+
+            const getIntensityDistribution = () => {
+                const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+                cravingLog.forEach(entry => {
+                    const intensity = parseInt(entry.intensity?.charAt(0)) || 0;
+                    if (intensity >= 1 && intensity <= 5) {
+                        distribution[intensity]++;
+                    }
+                });
+                return distribution;
+            };
+
+            // Action handlers
+            const handleHungerCheck = (level) => {
+                setHungerLevel(level);
+                if (level <= 2) {
+                    setCurrentView('wait');
+                    scheduleReminder(60, "Time to check your hunger level again!");
+                    setTimeout(() => {
+                        setCurrentView('home');
+                        setHungerLevel(null);
+                    }, 5000);
+                } else {
+                    setCurrentView('readyToEat');
+                }
+            };
+
+            const startEating = () => {
+                setIsEating(true);
+                setEatingStartTime(Date.now());
+                setCurrentView('eating');
+                setCurrentQuestion(0);
+                setEatingResponses([]);
+                setCurrentResponse('');
+            };
+
+            const nextEatingPrompt = () => {
+                if (currentResponse.trim() || eatingResponses[currentQuestion]) {
+                    const newResponses = [...eatingResponses];
+                    newResponses[currentQuestion] = currentResponse || eatingResponses[currentQuestion];
+                    setEatingResponses(newResponses);
+                }
+                
+                setCurrentResponse('');
+                
+                if (currentQuestion < mindfulEatingPrompts.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                } else {
+                    setCurrentView('eatingComplete');
+                }
+            };
+
+            const previousEatingPrompt = () => {
+                if (currentQuestion > 0) {
+                    setCurrentQuestion(currentQuestion - 1);
+                    setCurrentResponse(eatingResponses[currentQuestion - 1] || '');
+                }
+            };
+
+            const handleResponseSelect = (response) => {
+                setCurrentResponse(response);
+                const newResponses = [...eatingResponses];
+                newResponses[currentQuestion] = response;
+                setEatingResponses(newResponses);
+            };
+
+            const startCravingCheck = () => {
+                setCurrentView('cravingCheck');
+                setCurrentQuestion(0);
+                setCurrentCravingData({
+                    timestamp: new Date(),
+                    food: '',
+                    emotions: [],
+                    intensity: null,
+                    triggers: [],
+                    outcome: ''
+                });
+            };
+
+            const nextCravingQuestion = (selectedOption = null) => {
+                if (selectedOption) {
+                    const questionType = cravingQuestions[currentQuestion].type;
+                    const updatedData = { ...currentCravingData };
+                    
+                    if (cravingQuestions[currentQuestion].multiSelect) {
+                        if (!updatedData[questionType].includes(selectedOption)) {
+                            updatedData[questionType] = [...updatedData[questionType], selectedOption];
+                        }
+                    } else {
+                        updatedData[questionType] = selectedOption;
+                    }
+                    
+                    setCurrentCravingData(updatedData);
+                }
+                
+                if (currentQuestion < cravingQuestions.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                } else {
+                    setCurrentView('cravingResult');
+                }
+            };
+
+            const previousCravingQuestion = () => {
+                if (currentQuestion > 0) {
+                    setCurrentQuestion(currentQuestion - 1);
+                } else {
+                    setCurrentView('home');
+                }
+            };
+
+            // Component renders
+            const renderHeader = () => (
+                React.createElement('div', { className: 'sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10' },
+                    React.createElement('button', {
+                        onClick: () => setCurrentView('home'),
+                        className: 'p-2 text-gray-600 hover:text-gray-800'
+                    }, React.createElement(Home, { className: 'w-6 h-6' })),
+                    
+                    React.createElement('h1', { className: 'text-lg font-semibold text-gray-800 truncate mx-4' },
+                        currentView === 'home' ? 'Mindful Eating Coach' :
+                        currentView === 'hungerCheck' ? 'Hunger Check' :
+                        currentView === 'eating' ? 'Mindful Eating' :
+                        currentView === 'cravingCheck' ? 'Craving Assessment' :
+                        currentView === 'cravingResult' ? 'Craving Analysis' :
+                        currentView === 'cravingAnalytics' ? 'Your Patterns' :
+                        currentView === 'cravingTracking' ? 'Craving Tracker' :
+                        currentView === 'eatingComplete' ? 'Session Complete' : 'Mindful Eating Coach'
+                    ),
+                    
+                    React.createElement('button', {
+                        onClick: () => setIsMenuOpen(!isMenuOpen),
+                        className: 'p-2 text-gray-600 hover:text-gray-800'
+                    }, isMenuOpen ? React.createElement(X, { className: 'w-6 h-6' }) : React.createElement(Menu, { className: 'w-6 h-6' }))
+                )
+            );
+
+            const renderMenu = () => (
+                React.createElement('div', { 
+                    className: `fixed inset-0 bg-black bg-opacity-50 z-20 ${isMenuOpen ? 'block' : 'hidden'}`,
+                    onClick: () => setIsMenuOpen(false)
+                },
+                    React.createElement('div', { 
+                        className: 'fixed right-0 top-0 h-full w-64 bg-white shadow-lg p-4',
+                        onClick: (e) => e.stopPropagation()
+                    },
+                        React.createElement('div', { className: 'space-y-4 mt-16' },
+                            React.createElement('button', {
+                                onClick: () => {
+                                    setCurrentView('cravingTracking');
+                                    setIsMenuOpen(false);
+                                },
+                                className: 'w-full text-left p-3 rounded-lg hover:bg-gray-100 flex items-center'
+                            },
+                                React.createElement(BarChart, { className: 'w-5 h-5 mr-3 text-blue-500' }),
+                                'Craving Tracker'
+                            ),
+
+                            React.createElement('button', {
+                                onClick: () => {
+                                    setCurrentView('cravingAnalytics');
+                                    setIsMenuOpen(false);
+                                },
+                                className: 'w-full text-left p-3 rounded-lg hover:bg-gray-100 flex items-center'
+                            },
+                                React.createElement(AlertCircle, { className: 'w-5 h-5 mr-3 text-purple-500' }),
+                                'View Patterns'
+                            ),
+                            
+                            React.createElement('div', { className: 'pt-4 border-t border-gray-200' },
+                                React.createElement('p', { className: 'text-sm text-gray-500 mb-2' }, 'Notifications'),
+                                React.createElement('button', {
+                                    onClick: () => {
+                                        if ('Notification' in window) {
+                                            Notification.requestPermission();
+                                        }
+                                    },
+                                    className: 'w-full text-left p-3 rounded-lg hover:bg-gray-100 text-sm'
+                                }, 'Enable Reminders')
+                            )
+                        )
+                    )
+                )
+            );
+
+            const renderHome = () => (
+                React.createElement('div', { className: 'px-4 pb-6 space-y-6' },
+                    React.createElement('div', { className: 'text-center py-8' },
+                        React.createElement(Heart, { className: 'w-16 h-16 mx-auto text-green-500 mb-4' }),
+                        React.createElement('p', { className: 'text-gray-600 text-lg' }, 'Your companion for healthy eating habits')
+                    ),
+
+                    React.createElement('div', { className: 'space-y-4' },
+                        React.createElement('button', {
+                            onClick: () => setCurrentView('hungerCheck'),
+                            className: 'w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-colors flex items-center justify-center'
+                        },
+                            React.createElement(Clock, { className: 'w-6 h-6 mr-3' }),
+                            'Check My Hunger Level'
+                        ),
+
+                        React.createElement('button', {
+                            onClick: startCravingCheck,
+                            className: 'w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-colors flex items-center justify-center'
+                        },
+                            React.createElement(AlertCircle, { className: 'w-6 h-6 mr-3' }),
+                            "I'm Having a Craving"
+                        ),
+
+                        React.createElement('button', {
+                            onClick: () => setCurrentView('cravingTracking'),
+                            className: 'w-full bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-colors flex items-center justify-center'
+                        },
+                            React.createElement(BarChart, { className: 'w-6 h-6 mr-3' }),
+                            'Track Cravings'
+                        )
+                    ),
+
+                    cravingLog.length > 0 && React.createElement('div', { className: 'bg-purple-50 border border-purple-200 rounded-xl p-4' },
+                        React.createElement('h3', { className: 'font-semibold text-purple-800 mb-2' }, 'Quick Stats'),
+                        React.createElement('div', { className: 'text-sm text-purple-700' },
+                            React.createElement('p', null, `Total cravings tracked: ${cravingLog.length}`),
+                            React.createElement('p', null, `This week: ${cravingLog.filter(entry => {
+                                const weekAgo = new Date();
+                                weekAgo.setDate(weekAgo.getDate() - 7);
+                                return new Date(entry.timestamp) > weekAgo;
+                            }).length}`)
+                        )
+                    )
+                )
+            );
+
+            // Add new craving tracking view
+            const renderCravingTracking = () => {
+                const timeGroups = getCravingsByTimeOfDay();
+                const intensityDist = getIntensityDistribution();
+                const totalCravings = cravingLog.length;
+
+                // Get most common triggers
+                const triggerCounts = {};
+                cravingLog.forEach(entry => {
+                    entry.triggers?.forEach(trigger => {
+                        triggerCounts[trigger] = (triggerCounts[trigger] || 0) + 1;
+                    });
+                });
+                const topTriggers = Object.entries(triggerCounts)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 5);
+
+                return React.createElement('div', { className: 'px-4 pb-6 space-y-6' },
+                    React.createElement('div', { className: 'text-center py-4' },
+                        React.createElement(BarChart, { className: 'w-16 h-16 mx-auto text-indigo-500 mb-4' }),
+                        React.createElement('h2', { className: 'text-xl font-bold text-gray-800' }, 'Craving Tracker'),
+                        React.createElement('p', { className: 'text-gray-600' }, 'Discover your patterns')
+                    ),
+
+                    // Time of Day Analysis
+                    React.createElement('div', { className: 'bg-white border border-gray-200 rounded-xl p-6' },
+                        React.createElement('h3', { className: 'font-semibold text-gray-800 mb-4' }, '⏰ Time of Day Patterns'),
+                        totalCravings > 0 ? React.createElement('div', { className: 'space-y-3' },
+                            ['Morning', 'Afternoon', 'Evening', 'Night', 'Late Night'].map(timeOfDay => {
+                                const count = timeGroups[timeOfDay]?.length || 0;
+                                const percentage = totalCravings > 0 ? Math.round((count / totalCravings) * 100) : 0;
+                                return React.createElement('div', { key: timeOfDay, className: 'flex items-center justify-between' },
+                                    React.createElement('span', { className: 'text-sm font-medium text-gray-700' }, timeOfDay),
+                                    React.createElement('div', { className: 'flex items-center' },
+                                        React.createElement('div', { className: 'w-24 h-2 bg-gray-200 rounded-full mr-2' },
+                                            React.createElement('div', { 
+                                                className: 'h-2 bg-indigo-500 rounded-full',
+                                                style: { width: `${percentage}%` }
+                                            })
+                                        ),
+                                        React.createElement('span', { className: 'text-xs text-gray-500 w-8' }, `${count}`)
+                                    )
+                                );
+                            })
+                        ) : React.createElement('p', { className: 'text-gray-500 text-sm' }, 'No data yet. Start tracking your cravings!')
+                    ),
+
+                    // Intensity Distribution
+                    React.createElement('div', { className: 'bg-white border border-gray-200 rounded-xl p-6' },
+                        React.createElement('h3', { className: 'font-semibold text-gray-800 mb-4' }, '📊 Intensity Levels'),
+                        totalCravings > 0 ? React.createElement('div', { className: 'space-y-3' },
+                            [1, 2, 3, 4, 5].map(intensity => {
+                                const count = intensityDist[intensity];
+                                const percentage = totalCravings > 0 ? Math.round((count / totalCravings) * 100) : 0;
+                                const labels = ['Mild', 'Moderate', 'Strong', 'Very Strong', 'Overwhelming'];
+                                return React.createElement('div', { key: intensity, className: 'flex items-center justify-between' },
+                                    React.createElement('span', { className: 'text-sm font-medium text-gray-700' }, `${intensity} - ${labels[intensity-1]}`),
+                                    React.createElement('div', { className: 'flex items-center' },
+                                        React.createElement('div', { className: 'w-24 h-2 bg-gray-200 rounded-full mr-2' },
+                                            React.createElement('div', { 
+                                                className: `h-2 rounded-full ${
+                                                    intensity <= 2 ? 'bg-green-500' :
+                                                    intensity <= 3 ? 'bg-yellow-500' :
+                                                    'bg-red-500'
+                                                }`,
+                                                style: { width: `${percentage}%` }
+                                            })
+                                        ),
+                                        React.createElement('span', { className: 'text-xs text-gray-500 w-8' }, `${count}`)
+                                    )
+                                );
+                            })
+                        ) : React.createElement('p', { className: 'text-gray-500 text-sm' }, 'No intensity data yet.')
+                    ),
+
+                    // Top Triggers
+                    React.createElement('div', { className: 'bg-white border border-gray-200 rounded-xl p-6' },
+                        React.createElement('h3', { className: 'font-semibold text-gray-800 mb-4' }, '🎯 Most Common Triggers'),
+                        topTriggers.length > 0 ? React.createElement('div', { className: 'space-y-3' },
+                            topTriggers.map(([trigger, count]) => {
+                                const percentage = totalCravings > 0 ? Math.round((count / totalCravings) * 100) : 0;
+                                return React.createElement('div', { key: trigger, className: 'flex items-center justify-between' },
+                                    React.createElement('span', { className: 'text-sm font-medium text-gray-700' }, trigger),
+                                    React.createElement('div', { className: 'flex items-center' },
+                                        React.createElement('div', { className: 'w-24 h-2 bg-gray-200 rounded-full mr-2' },
+                                            React.createElement('div', { 
+                                                className: 'h-2 bg-orange-500 rounded-full',
+                                                style: { width: `${percentage}%` }
+                                            })
+                                        ),
+                                        React.createElement('span', { className: 'text-xs text-gray-500 w-8' }, `${count}`)
+                                    )
+                                );
+                            })
+                        ) : React.createElement('p', { className: 'text-gray-500 text-sm' }, 'No trigger data yet.')
+                    ),
+
+                    // Recent Activity
+                    React.createElement('div', { className: 'bg-white border border-gray-200 rounded-xl p-6' },
+                        React.createElement('h3', { className: 'font-semibold text-gray-800 mb-4' }, '📝 Recent Cravings'),
+                        cravingLog.length > 0 ? React.createElement('div', { className: 'space-y-3 max-h-60 overflow-y-auto' },
+                            cravingLog.slice(-10).reverse().map((entry, index) => {
+                                const date = new Date(entry.timestamp);
+                                const timeOfDay = getTimeOfDay(date);
+                                const intensity = parseInt(entry.intensity?.charAt(0)) || 0;
+                                
+                                return React.createElement('div', { key: index, className: 'bg-gray-50 rounded-lg p-3 border border-gray-100' },
+                                    React.createElement('div', { className: 'flex justify-between items-start mb-2' },
+                                        React.createElement('div', { className: 'flex-1' },
+                                            React.createElement('p', { className: 'font-medium text-gray-800 text-sm' }, entry.food),
+                                            React.createElement('p', { className: 'text-xs text-gray-500' },
+                                                `${date.toLocaleDateString()} • ${timeOfDay} • Intensity: ${intensity}/5`
+                                            )
+                                        )
+                                    ),
+                                    entry.triggers?.length > 0 && React.createElement('div', { className: 'mt-2' },
+                                        React.createElement('p', { className: 'text-xs text-gray-600' },
+                                            `Triggers: ${entry.triggers.slice(0, 2).join(', ')}${entry.triggers.length > 2 ? '...' : ''}`
+                                        )
+                                    )
+                                );
+                            })
+                        ) : React.createElement('p', { className: 'text-gray-500 text-sm' }, 'No cravings tracked yet. Complete a craving assessment to start!')
+                    )
+                );
+            };
