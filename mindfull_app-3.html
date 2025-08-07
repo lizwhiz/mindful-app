@@ -1,0 +1,2554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MindFULL - Mindful Eating Coach</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .glassmorphism-dark {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glassmorphism-white {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .nature-gradient {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 25%, #00b894 50%, #00cec9 75%, #6c5ce7 100%);
+        }
+        
+        .blue-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .green-gradient {
+            background: linear-gradient(135deg, #a8e6cf 0%, #88d8c0 25%, #78c2ad 50%, #689f99 75%, #5d8a8a 100%);
+        }
+        
+        .warm-gradient {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 25%, #a29bfe 50%, #74b9ff 75%, #0984e3 100%);
+        }
+        
+        .purple-gradient {
+            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 25%, #fd79a8 50%, #fdcb6e 75%, #e17055 100%);
+        }
+        
+        .orange-dream-gradient {
+            background: linear-gradient(135deg, #e17055 0%, #d63031 25%, #b33939 50%, #e17055 75%, #d68910 100%);
+        }
+        
+        .result-gradient {
+            background: linear-gradient(135deg, #8b5a3c 0%, #7a3f3f 25%, #6b2c3e 50%, #5d1a3b 75%, #4a1c40 100%);
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        .text-shadow {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .glassmorphism-stronger {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .card-hover:focus {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        
+        .floating-button {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff7675, #fd79a8);
+            box-shadow: 0 10px 25px rgba(255, 118, 117, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            z-index: 50;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .floating-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 35px rgba(255, 118, 117, 0.6);
+        }
+        
+        .floating-button:focus {
+            outline: 2px solid #ffffff;
+            outline-offset: 2px;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 448px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px));
+            z-index: 40;
+        }
+        
+        .page-transition {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .scale-animation {
+            animation: scaleIn 0.2s ease-out;
+        }
+        
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        .intensity-slider, .hunger-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        .intensity-slider {
+            background: linear-gradient(to right, #ffeaa7 0%, #fdcb6e 25%, #e17055 50%, #d63031 75%, #b2bec3 100%);
+        }
+        
+        .hunger-slider {
+            background: linear-gradient(to right, #00b894 0%, #00cec9 15%, #74b9ff 30%, #0984e3 45%, #fdcb6e 60%, #e17055 75%, #d63031 100%);
+        }
+        
+        .intensity-slider::-webkit-slider-thumb, .hunger-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid #fd79a8;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .intensity-slider:focus, .hunger-slider:focus {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        
+        .chart-bar {
+            transition: all 0.3s ease;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        
+        .journal-entry {
+            transition: all 0.2s ease;
+        }
+        
+        .journal-entry:hover {
+            background-color: #f8fafc;
+            transform: translateX(4px);
+        }
+        
+        .glow-on-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .glow-on-hover:hover {
+            box-shadow: 0 0 20px rgba(255, 154, 86, 0.3), 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (prefers-contrast: high) {
+            .glassmorphism {
+                background: rgba(255, 255, 255, 0.9);
+                border: 2px solid rgba(0, 0, 0, 0.5);
+            }
+            
+            .glassmorphism-dark {
+                background: rgba(0, 0, 0, 0.8);
+                border: 2px solid rgba(255, 255, 255, 0.8);
+            }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .card-hover {
+                transition: none;
+            }
+            
+            .page-transition {
+                animation: none;
+            }
+            
+            .scale-animation {
+                animation: none;
+            }
+            
+            .pulse-animation {
+                animation: none;
+            }
+        }
+        
+        .focus-visible:focus {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        input:focus, textarea:focus {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useMemo, memo } = React;
+
+        // SVG Icon Components
+        const HomeIcon = ({ className = "w-6 h-6" }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+            </svg>
+        );
+        
+        const JournalIcon = ({ className = "w-6 h-6" }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 102 0V3h4v1a1 1 0 102 0V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm8 5a1 1 0 100-2 1 1 0 000 2z"/>
+            </svg>
+        );
+        
+        const InsightsIcon = ({ className = "w-6 h-6" }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/>
+                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/>
+            </svg>
+        );
+        
+        const HeartIcon = ({ className = "w-6 h-6" }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
+            </svg>
+        );
+        
+        const ClockIcon = ({ className = "w-6 h-6" }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/>
+            </svg>
+        );
+        
+        const AlertIcon = ({ className = "w-6 h-6" }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"/>
+            </svg>
+        );
+        
+        const CheckIcon = ({ className = "w-6 h-6" }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+            </svg>
+        );
+        
+        const LightbulbIcon = ({ className = "w-6 h-6" }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.477.859h4z"/>
+            </svg>
+        );
+        
+        const PlusIcon = ({ className = "w-6 h-6" }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+            </svg>
+        );
+        
+        const ArrowLeftIcon = ({ className = "w-6 h-6" }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        );
+        
+        const PenIcon = ({ className = "w-6 h-6" }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+            </svg>
+        );
+        
+        const SearchIcon = ({ className = "w-6 h-6" }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+            </svg>
+        );
+
+        const PlayIcon = ({ className = "w-6 h-6" }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"/>
+            </svg>
+        );
+
+        // Enhanced Text Input Component with Save + Blur pattern
+        const TextInput = memo(({ 
+            value, 
+            onChange, 
+            onBlur, 
+            placeholder, 
+            className = "", 
+            id,
+            "aria-label": ariaLabel,
+            ...props 
+        }) => {
+            const [localValue, setLocalValue] = useState(value || '');
+
+            // Sync initial value
+            useEffect(() => {
+                setLocalValue(value || '');
+            }, [value]);
+
+            const handleChange = useCallback((e) => {
+                setLocalValue(e.target.value);
+            }, []);
+
+            const handleBlur = useCallback((e) => {
+                if (onBlur) {
+                    onBlur(localValue);
+                }
+            }, [localValue, onBlur]);
+
+            return (
+                <input
+                    id={id}
+                    type="text"
+                    value={localValue}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    placeholder={placeholder}
+                    className={className}
+                    aria-label={ariaLabel}
+                    {...props}
+                />
+            );
+        });
+
+        // Hunger Check View Component
+        const HungerCheckView = memo(({ hungerLevel, onHungerChange, onContinue, onBack, getHungerLabel }) => (
+            <div className="min-h-screen page-transition">
+                <div className="blue-gradient px-6 pt-12 pb-8">
+                    <NavigationHeader
+                        title="Hunger Check"
+                        onBack={onBack}
+                    />
+
+                    <div className="text-center text-white mb-8">
+                        <div className="w-20 h-20 glassmorphism-dark rounded-full mx-auto mb-4 flex items-center justify-center" aria-hidden="true">
+                            <ClockIcon className="w-10 h-10 text-white" />
+                        </div>
+                        <h2 className="text-2xl font-bold mb-2">How hungry are you?</h2>
+                        <p className="text-white text-opacity-80">Use the slider to rate your hunger</p>
+                    </div>
+
+                    <div className="glassmorphism-stronger rounded-2xl p-6 mb-6">
+                        <div className="text-center mb-6">
+                            <div className="text-4xl font-bold text-white mb-2 text-shadow" aria-label={`Hunger level ${hungerLevel}`}>
+                                {hungerLevel}
+                            </div>
+                            <div className="text-lg text-white opacity-90 mb-3 text-shadow">
+                                {getHungerLabel(hungerLevel).label}
+                            </div>
+                            <div className="text-sm text-white opacity-80 text-shadow bg-white bg-opacity-10 rounded-lg p-3">
+                                {getHungerLabel(hungerLevel).sensation}
+                            </div>
+                        </div>
+                        
+                        <div className="mb-4">
+                            <label htmlFor="hunger-slider" className="sr-only">Hunger level from 1 (not hungry) to 7 (starving)</label>
+                            <input
+                                id="hunger-slider"
+                                type="range"
+                                min="1"
+                                max="7"
+                                value={hungerLevel}
+                                onChange={(e) => onHungerChange(parseInt(e.target.value))}
+                                className="hunger-slider w-full mb-4"
+                                aria-describedby="hunger-description"
+                            />
+                        </div>
+                        
+                        <div className="flex justify-between text-xs text-white opacity-70">
+                            <span>Not hungry</span>
+                            <span>Starving</span>
+                        </div>
+                        
+                        <div id="hunger-description" className="sr-only">
+                            Current selection: {getHungerLabel(hungerLevel).sensation}
+                        </div>
+                    </div>
+
+                    <div className="glassmorphism rounded-xl p-4 mb-6" role="region" aria-label="Tips for evaluating hunger">
+                        <h3 className="font-semibold text-white mb-2 flex items-center">
+                            <LightbulbIcon className="w-4 h-4 mr-2" aria-hidden="true" />
+                            Tips for Evaluating Hunger
+                        </h3>
+                        <ul className="text-sm text-white opacity-90 space-y-1">
+                            <li>• Notice physical sensations in your stomach</li>
+                            <li>• Ask: "Would plain food sound good right now?"</li>
+                            <li>• Check if you feel low energy or lightheaded</li>
+                            <li>• Consider when you last ate a substantial meal</li>
+                            <li>• Distinguish between hunger and thirst</li>
+                        </ul>
+                    </div>
+
+                    <button
+                        onClick={() => onContinue(hungerLevel)}
+                        className="w-full glassmorphism-white text-gray-800 font-semibold py-4 px-6 rounded-xl shadow-lg transition-all card-hover focus-visible"
+                    >
+                        Continue with Level {hungerLevel}
+                    </button>
+                </div>
+                
+                <div className="pb-20"></div>
+            </div>
+        ));
+
+        // Wait View Component
+        const WaitView = memo(({ hungerLevel, onReturnHome }) => (
+            <div className="min-h-screen page-transition">
+                <div className="blue-gradient flex items-center justify-center min-h-screen px-6">
+                    <div className="text-center">
+                        <div className="w-24 h-24 glassmorphism-dark rounded-full mx-auto mb-6 flex items-center justify-center pulse-animation" aria-hidden="true">
+                            <ClockIcon className="w-12 h-12 text-white" />
+                        </div>
+                        <h1 className="text-2xl font-bold text-white mb-4 text-shadow">Not quite hungry yet!</h1>
+                        <p className="text-white text-opacity-80 mb-6 text-shadow">
+                            Since you're at a {hungerLevel} on the hunger scale, let's wait a bit longer.
+                        </p>
+                        <div className="glassmorphism rounded-xl p-4 mb-6">
+                            <p className="text-sm text-white opacity-90 text-shadow">
+                                Try having a glass of water and check back in 30-60 minutes.
+                            </p>
+                        </div>
+                        <button
+                            onClick={onReturnHome}
+                            className="w-full glassmorphism-white text-gray-800 font-semibold py-4 px-6 rounded-xl shadow-lg transition-all card-hover focus-visible"
+                            aria-label="Return to home screen"
+                        >
+                            Return Home
+                        </button>
+                    </div>
+                </div>
+            </div>
+        ));
+
+        // Ready to Eat View Component
+        const ReadyToEatView = memo(({ hungerLevel, onStartEating, onReturnHome }) => (
+            <div className="min-h-screen page-transition">
+                <div className="green-gradient flex items-center justify-center min-h-screen px-6">
+                    <div className="text-center">
+                        <div className="w-24 h-24 glassmorphism-dark rounded-full mx-auto mb-6 flex items-center justify-center scale-animation" aria-hidden="true">
+                            <CheckIcon className="w-12 h-12 text-white" />
+                        </div>
+                        <h1 className="text-2xl font-bold text-white mb-4 text-shadow">You're hungry!</h1>
+                        <p className="text-white text-opacity-80 mb-8 text-shadow">
+                            Your hunger level is {hungerLevel}. Are you ready to eat mindfully?
+                        </p>
+                        
+                        <div className="space-y-4">
+                            <button
+                                onClick={onStartEating}
+                                className="w-full glassmorphism-white text-gray-800 font-semibold py-4 px-6 rounded-xl shadow-lg transition-all card-hover focus-visible"
+                                aria-label="Start guided mindful eating session"
+                            >
+                                Yes, start mindful eating
+                            </button>
+                            
+                            <button
+                                onClick={onReturnHome}
+                                className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all card-hover border border-white border-opacity-30 focus-visible"
+                                aria-label="Return to home screen"
+                            >
+                                Return Home
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        ));
+
+        // Eating View Component
+        const EatingView = memo(({ 
+            currentQuestion, 
+            mindfulEatingPrompts, 
+            eatingResponses,
+            onNext, 
+            onPrevious, 
+            onResponseSelect 
+        }) => {
+            const [currentResponse, setCurrentResponse] = useState(eatingResponses[currentQuestion] || '');
+
+            const handleTextResponse = useCallback((value) => {
+                setCurrentResponse(value);
+            }, []);
+
+            const handleNext = useCallback(() => {
+                onNext(currentResponse);
+                setCurrentResponse('');
+            }, [currentResponse, onNext]);
+
+            const handleOptionSelect = useCallback((option) => {
+                setCurrentResponse(option);
+                onResponseSelect(option);
+            }, [onResponseSelect]);
+
+            return (
+                <div className="min-h-screen page-transition">
+                    <div className="green-gradient px-6 pt-12 pb-8">
+                        <header className="text-center mb-8">
+                            <div className="w-16 h-16 mx-auto glassmorphism-dark rounded-full flex items-center justify-center mb-4" aria-hidden="true">
+                                <HeartIcon className="w-8 h-8 text-white" />
+                            </div>
+                            <div className="text-sm text-white opacity-80 mb-2">
+                                Step {currentQuestion + 1} of {mindfulEatingPrompts.length}
+                            </div>
+                            
+                            <div className="w-full bg-white bg-opacity-20 rounded-full h-2 mb-4" role="progressbar" aria-valuenow={currentQuestion + 1} aria-valuemin={1} aria-valuemax={mindfulEatingPrompts.length} aria-label={`Progress: step ${currentQuestion + 1} of ${mindfulEatingPrompts.length}`}>
+                                <div 
+                                    className="bg-white h-2 rounded-full progress-bar"
+                                    style={{ width: `${((currentQuestion + 1) / mindfulEatingPrompts.length) * 100}%` }}
+                                ></div>
+                            </div>
+                        </header>
+
+                        <main className="glassmorphism rounded-2xl p-6 mb-6">
+                            <p className="text-white text-lg leading-relaxed mb-4">
+                                {mindfulEatingPrompts[currentQuestion].text}
+                            </p>
+                            
+                            {mindfulEatingPrompts[currentQuestion].options ? (
+                                <div className="space-y-3" role="radiogroup" aria-label="Response options">
+                                    {mindfulEatingPrompts[currentQuestion].options.map((option, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => handleOptionSelect(option)}
+                                            role="radio"
+                                            aria-checked={currentResponse === option}
+                                            className={`w-full p-3 text-left rounded-lg border-2 transition-all card-hover focus-visible ${
+                                                currentResponse === option
+                                                    ? 'border-white bg-white bg-opacity-20 text-white'
+                                                    : 'border-white border-opacity-30 bg-white bg-opacity-10 hover:bg-opacity-20 text-white'
+                                            }`}
+                                        >
+                                            {option}
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div>
+                                    <TextArea
+                                        id="eating-response"
+                                        value={currentResponse}
+                                        onBlur={handleTextResponse}
+                                        placeholder={mindfulEatingPrompts[currentQuestion].placeholder}
+                                        className="w-full p-4 border border-white border-opacity-30 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-white text-base bg-white bg-opacity-10 text-white placeholder-white placeholder-opacity-70"
+                                        rows={4}
+                                        aria-label={mindfulEatingPrompts[currentQuestion].placeholder}
+                                    />
+                                </div>
+                            )}
+                        </main>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <button
+                                onClick={onPrevious}
+                                disabled={currentQuestion === 0}
+                                className={`font-semibold py-3 px-6 rounded-xl shadow-lg transition-all focus-visible ${
+                                    currentQuestion === 0 
+                                        ? 'bg-white bg-opacity-10 text-white opacity-50 cursor-not-allowed'
+                                        : 'bg-white bg-opacity-20 hover:bg-opacity-30 text-white card-hover border border-white border-opacity-30'
+                                }`}
+                                aria-label="Go to previous step"
+                            >
+                                Back
+                            </button>
+                            
+                            <button
+                                onClick={handleNext}
+                                className="glassmorphism-white text-gray-800 font-semibold py-3 px-6 rounded-xl shadow-lg transition-all card-hover focus-visible"
+                                aria-label={currentQuestion < mindfulEatingPrompts.length - 1 ? "Go to next step" : "Finish mindful eating session"}
+                            >
+                                {currentQuestion < mindfulEatingPrompts.length - 1 ? 'Next' : 'Finish'}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div className="pb-20"></div>
+                </div>
+            );
+        });
+
+        // Eating Complete View Component
+        const EatingCompleteView = memo(({ onComplete }) => {
+            const handleComplete = useCallback((note) => {
+                onComplete(note);
+            }, [onComplete]);
+
+            return (
+                <div className="min-h-screen page-transition">
+                    <div className="green-gradient px-6 pt-12 pb-8">
+                        <div className="text-center mb-8">
+                            <div className="w-24 h-24 glassmorphism-dark rounded-full mx-auto mb-6 flex items-center justify-center scale-animation" aria-hidden="true">
+                                <CheckIcon className="w-12 h-12 text-white" />
+                            </div>
+                            <h1 className="text-2xl font-bold text-white mb-2">Great job!</h1>
+                            <p className="text-white text-opacity-80">How was your mindful eating experience?</p>
+                        </div>
+                        
+                        <div className="glassmorphism rounded-2xl p-6 mb-6">
+                            <TextArea
+                                id="eating-note"
+                                value=""
+                                onBlur={handleComplete}
+                                placeholder="How did this eating experience feel? What did you notice about your hunger, satisfaction, or the food itself?"
+                                className="w-full p-4 border border-white border-opacity-30 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-white text-base bg-white bg-opacity-10 text-white placeholder-white placeholder-opacity-70"
+                                rows={5}
+                                aria-label="Reflect on your mindful eating experience"
+                            />
+                        </div>
+
+                        <button
+                            onClick={() => handleComplete('')}
+                            className="w-full glassmorphism-white text-gray-800 font-semibold py-4 px-6 rounded-xl shadow-lg transition-all card-hover focus-visible"
+                        >
+                            Save & Return Home
+                        </button>
+                    </div>
+                    
+                    <div className="pb-20"></div>
+                </div>
+            );
+        });
+
+        // Craving Check View Component
+        const CravingCheckView = memo(({ 
+            currentQuestion, 
+            cravingQuestions, 
+            currentCravingData,
+            onNext, 
+            onPrevious,
+            onIntensityChange,
+            onOptionToggle,
+            onTriggerNotesChange,
+            onSkipToResults 
+        }) => (
+            <div className="min-h-screen page-transition">
+                <div className="orange-dream-gradient px-6 pt-12 pb-8">
+                    <header className="flex items-center justify-between mb-6">
+                        <button 
+                            onClick={onPrevious}
+                            className="w-10 h-10 glassmorphism-dark rounded-full flex items-center justify-center focus-visible"
+                            aria-label="Go back"
+                        >
+                            <ArrowLeftIcon className="w-5 h-5 text-white" />
+                        </button>
+                        <div className="text-center">
+                            <div className="text-sm text-white opacity-80 mb-1 text-shadow">Question {currentQuestion + 1} of {cravingQuestions.length}</div>
+                            <div className="w-24 h-1 bg-white bg-opacity-20 rounded-full mx-auto" role="progressbar" aria-valuenow={currentQuestion + 1} aria-valuemin={1} aria-valuemax={cravingQuestions.length} aria-label={`Progress: question ${currentQuestion + 1} of ${cravingQuestions.length}`}>
+                                <div 
+                                    className="h-1 bg-white rounded-full progress-bar"
+                                    style={{ width: `${((currentQuestion + 1) / cravingQuestions.length) * 100}%` }}
+                                ></div>
+                            </div>
+                        </div>
+                        <div className="w-10 h-10"></div>
+                    </header>
+
+                    <div className="text-center mb-8">
+                        <div className="w-20 h-20 glassmorphism-stronger rounded-full mx-auto mb-4 flex items-center justify-center" aria-hidden="true">
+                            <AlertIcon className="w-10 h-10 text-white" />
+                        </div>
+                        <h1 className="text-2xl font-bold text-white mb-2 text-shadow">
+                            {cravingQuestions[currentQuestion].question}
+                        </h1>
+                    </div>
+
+                    <main className="glassmorphism-stronger rounded-2xl p-6 mb-6">
+                        {cravingQuestions[currentQuestion].useSlider ? (
+                            <div className="space-y-6">
+                                <div className="text-center">
+                                    <div className="text-4xl font-bold text-white mb-2 text-shadow" aria-label={`Intensity level ${currentCravingData.intensity}`}>
+                                        {currentCravingData.intensity}
+                                    </div>
+                                    <div className="text-sm text-white opacity-80 text-shadow">
+                                        {currentCravingData.intensity === 1 ? 'Mild' :
+                                        currentCravingData.intensity === 2 ? 'Moderate' :
+                                        currentCravingData.intensity === 3 ? 'Strong' :
+                                        currentCravingData.intensity === 4 ? 'Very Strong' : 'Overwhelming'}
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label htmlFor="intensity-slider" className="sr-only">Craving intensity from 1 (mild) to 5 (overwhelming)</label>
+                                    <input
+                                        id="intensity-slider"
+                                        type="range"
+                                        min="1"
+                                        max="5"
+                                        value={currentCravingData.intensity}
+                                        onChange={(e) => onIntensityChange(parseInt(e.target.value))}
+                                        className="intensity-slider w-full"
+                                    />
+                                </div>
+                                
+                                <div className="flex justify-between text-xs text-white opacity-70">
+                                    <span>Mild</span>
+                                    <span>Overwhelming</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-3" role={cravingQuestions[currentQuestion].multiSelect ? "group" : "radiogroup"} aria-label="Response options">
+                                {cravingQuestions[currentQuestion].options.map((option, index) => {
+                                    const isSelected = cravingQuestions[currentQuestion].multiSelect 
+                                        ? currentCravingData[cravingQuestions[currentQuestion].type]?.includes(option)
+                                        : currentCravingData[cravingQuestions[currentQuestion].type] === option;
+                                        
+                                    return (
+                                        <button
+                                            key={index}
+                                            onClick={() => onOptionToggle(option)}
+                                            role={cravingQuestions[currentQuestion].multiSelect ? undefined : "radio"}
+                                            aria-checked={isSelected}
+                                            className={`w-full p-3 text-left rounded-lg border-2 transition-all card-hover glow-on-hover focus-visible ${
+                                                isSelected
+                                                    ? 'border-white bg-white bg-opacity-20 text-white'
+                                                    : 'border-white border-opacity-30 bg-white bg-opacity-10 hover:bg-opacity-20 text-white'
+                                            }`}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm">{option}</span>
+                                                {isSelected && <CheckIcon className="w-5 h-5 text-white" aria-hidden="true" />}
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+                        
+                        {cravingQuestions[currentQuestion].type === 'triggers' && (
+                            <div className="mt-4">
+                                <TextArea
+                                    id="trigger-notes"
+                                    value={currentCravingData.triggerNotes}
+                                    onBlur={onTriggerNotesChange}
+                                    placeholder="Any other triggers or details about what might have caused this craving?"
+                                    className="w-full p-3 border border-white border-opacity-30 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-white text-base bg-white bg-opacity-10 text-white placeholder-white placeholder-opacity-70"
+                                    rows={3}
+                                    aria-label="Additional trigger details"
+                                />
+                            </div>
+                        )}
+                    </main>
+
+                    <div className="glassmorphism-stronger rounded-xl p-4 mb-6" role="region" aria-label="Insight">
+                        <div className="flex items-start">
+                            <LightbulbIcon className="w-5 h-5 text-white mr-2 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                            <p className="text-sm text-white opacity-90 text-shadow">
+                                {cravingQuestions[currentQuestion].insight}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-3">
+                        {(cravingQuestions[currentQuestion].multiSelect || cravingQuestions[currentQuestion].useSlider) && (
+                            <button
+                                onClick={() => onNext()}
+                                className="w-full glassmorphism-white text-gray-800 font-semibold py-4 px-6 rounded-xl shadow-lg transition-all card-hover focus-visible"
+                            >
+                                Continue
+                            </button>
+                        )}
+                        
+                        <button
+                            onClick={onSkipToResults}
+                            className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold py-3 px-6 rounded-xl transition-all card-hover border border-white border-opacity-30 focus-visible"
+                        >
+                            Skip to Results
+                        </button>
+                    </div>
+                </div>
+                
+                <div className="pb-20"></div>
+            </div>
+        ));
+
+        // Craving Result View Component
+        const CravingResultView = memo(({ 
+            currentCravingData, 
+            getRandomActivities,
+            getAICravingInsight,
+            onLogOutcome,
+            onNavigate 
+        }) => {
+            const isLikelyRealHunger = () => {
+                const isFullMeal = currentCravingData.food === "A full meal";
+                const isNeutralEmotion = currentCravingData.emotions?.includes("Neutral");
+                const isLongSinceEating = currentCravingData.timing === "3-4 hours ago" || 
+                                        currentCravingData.timing === "4-6 hours ago" || 
+                                        currentCravingData.timing === "More than 6 hours ago";
+                
+                return isFullMeal && isNeutralEmotion && isLongSinceEating;
+            };
+
+            const showRealHungerMessage = isLikelyRealHunger();
+
+            const handleRealHunger = useCallback(() => {
+                onLogOutcome('recognized_real_hunger');
+                onNavigate('hungerCheck');
+            }, [onLogOutcome, onNavigate]);
+
+            const handleTryActivities = useCallback(() => {
+                onLogOutcome('tried_distraction');
+                onNavigate('home');
+            }, [onLogOutcome, onNavigate]);
+
+            const handleCheckHunger = useCallback(() => {
+                onLogOutcome('chose_to_eat');
+                onNavigate('hungerCheck');
+            }, [onLogOutcome, onNavigate]);
+
+            return (
+                <div className="min-h-screen page-transition">
+                    <div className="result-gradient px-6 pt-12 pb-8">
+                        <header className="text-center mb-8">
+                            <div className="w-24 h-24 glassmorphism-stronger rounded-full mx-auto mb-6 flex items-center justify-center scale-animation" aria-hidden="true">
+                                <LightbulbIcon className="w-12 h-12 text-white" />
+                            </div>
+                            <h1 className="text-2xl font-bold text-white text-shadow">Craving Analysis</h1>
+                        </header>
+                        
+                        <main className="glassmorphism-stronger rounded-2xl p-6 shadow-lg mb-6" role="region" aria-label="AI pattern analysis">
+                            <h2 className="text-lg font-semibold text-white mb-4 text-shadow">
+                                <LightbulbIcon className="w-5 h-5 inline mr-2" aria-hidden="true" />
+                                AI Pattern Recognition
+                            </h2>
+                            <p className="text-white text-shadow opacity-90 leading-relaxed">
+                                {getAICravingInsight()}
+                            </p>
+                        </main>
+
+                        {showRealHungerMessage ? (
+                            <div className="glassmorphism-stronger rounded-xl p-4 mb-6" role="region" aria-label="Real hunger detected">
+                                <div className="flex items-start">
+                                    <CheckIcon className="w-6 h-6 text-green-300 mr-3 flex-shrink-0" aria-hidden="true" />
+                                    <div>
+                                        <h3 className="font-semibold text-white mb-1 text-shadow">This looks like real hunger!</h3>
+                                        <p className="text-sm text-white opacity-90 text-shadow">
+                                            You're craving a full meal, feeling emotionally neutral, and it's been a while since you last ate.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="glassmorphism-stronger rounded-xl p-4 mb-6" role="region" aria-label="Emotional eating detected">
+                                <div className="flex items-start">
+                                    <AlertIcon className="w-6 h-6 text-blue-300 mr-3 flex-shrink-0" aria-hidden="true" />
+                                    <div>
+                                        <h3 className="font-semibold text-white mb-1 text-shadow">This seems like emotional eating</h3>
+                                        <p className="text-sm text-white opacity-90 text-shadow">
+                                            Based on your responses, this might be more about emotions than physical hunger.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {!showRealHungerMessage && (
+                            <div className="glassmorphism-stronger rounded-xl p-4 shadow-lg mb-6" role="region" aria-label="Alternative activities">
+                                <h3 className="font-semibold text-white mb-3 text-shadow">Try one of these instead:</h3>
+                                <ul className="space-y-2">
+                                    {getRandomActivities().map((activity, index) => (
+                                        <li key={index} className="flex items-center p-2 bg-white bg-opacity-10 rounded-lg">
+                                            <CheckIcon className="w-4 h-4 text-green-300 mr-3 flex-shrink-0" aria-hidden="true" />
+                                            <span className="text-sm text-white text-shadow">{activity}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        <div className="space-y-3">
+                            {showRealHungerMessage ? (
+                                <button
+                                    onClick={handleRealHunger}
+                                    className="w-full glassmorphism-white text-gray-800 font-semibold py-4 px-6 rounded-xl shadow-lg transition-all card-hover focus-visible"
+                                >
+                                    Check my hunger level and eat
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleTryActivities}
+                                    className="w-full glassmorphism-white text-gray-800 font-semibold py-4 px-6 rounded-xl shadow-lg transition-all card-hover focus-visible"
+                                >
+                                    I'll try these activities
+                                </button>
+                            )}
+                            
+                            <button
+                                onClick={handleCheckHunger}
+                                className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all card-hover border border-white border-opacity-30 focus-visible"
+                            >
+                                Actually, let me check my hunger level
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div className="pb-20"></div>
+                </div>
+            );
+        });
+
+        // Insights View Component
+        const InsightsView = memo(({ 
+            cravingLog, 
+            onStartCravingCheck, 
+            onNavigate,
+            getDailyCravingCounts,
+            getIntensityDistribution,
+            getCravingsByTimeOfDay,
+            getMostCommonTriggers,
+            getSuccessRate,
+            getCurrentStreak,
+            getSmartInsight,
+            getTimeOfDay
+        }) => {
+            const dailyCounts = getDailyCravingCounts();
+            const intensityDist = getIntensityDistribution();
+            const timeGroups = getCravingsByTimeOfDay();
+            const topTriggers = getMostCommonTriggers();
+            const successRate = getSuccessRate();
+            const currentStreak = getCurrentStreak();
+            const smartInsight = getSmartInsight();
+
+            return (
+                <div className="min-h-screen bg-gray-50 page-transition">
+                    <div className="px-6 pt-12 pb-6">
+                        <header className="text-center mb-8" role="banner">
+                            <div className="w-20 h-20 bg-indigo-100 rounded-full mx-auto mb-4 flex items-center justify-center" aria-hidden="true">
+                                <InsightsIcon className="w-10 h-10 text-indigo-600" />
+                            </div>
+                            <h1 className="text-2xl font-bold text-gray-800">Your Insights</h1>
+                            <p className="text-gray-600">Discover your patterns and progress</p>
+                        </header>
+
+                        <div className="bg-white rounded-xl p-4 shadow-lg mb-6" role="region" aria-label="Quick actions">
+                            <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                                <PlayIcon className="w-5 h-5 mr-2 text-indigo-600" aria-hidden="true" />
+                                Quick Actions
+                            </h2>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    onClick={onStartCravingCheck}
+                                    className="bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-lg font-medium text-sm transition-all card-hover flex items-center justify-center focus-visible"
+                                    aria-label="Start craving assessment"
+                                >
+                                    <AlertIcon className="w-4 h-4 mr-2" aria-hidden="true" />
+                                    Track Craving
+                                </button>
+                                <button
+                                    onClick={() => onNavigate('hungerCheck')}
+                                    className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-medium text-sm transition-all card-hover flex items-center justify-center focus-visible"
+                                    aria-label="Check hunger level"
+                                >
+                                    <ClockIcon className="w-4 h-4 mr-2" aria-hidden="true" />
+                                    Check Hunger
+                                </button>
+                            </div>
+                        </div>
+
+                        {cravingLog.length > 0 && (
+                            <div className="bg-white rounded-xl p-4 shadow-lg mb-6" role="region" aria-label="Recent activity">
+                                <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h2>
+                                <div className="space-y-3 max-h-48 overflow-y-auto">
+                                    {cravingLog.slice(-5).reverse().map((entry, index) => {
+                                        const date = new Date(entry.timestamp);
+                                        const timeOfDay = getTimeOfDay(date);
+                                        
+                                        return (
+                                            <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div className="flex-1">
+                                                        <p className="font-medium text-gray-800 text-sm">{entry.food}</p>
+                                                        <p className="text-xs text-gray-500">
+                                                            <time dateTime={date.toISOString()}>
+                                                                {date.toLocaleDateString()}
+                                                            </time>
+                                                            <span aria-hidden="true"> • </span>
+                                                            {timeOfDay}
+                                                        </p>
+                                                    </div>
+                                                    <div 
+                                                        className={`w-3 h-3 rounded-full ${
+                                                            ['tried_distraction', 'recognized_real_hunger'].includes(entry.outcome) 
+                                                                ? 'bg-green-400' : 'bg-orange-400'
+                                                        }`}
+                                                        aria-label={['tried_distraction', 'recognized_real_hunger'].includes(entry.outcome) ? 'Successful outcome' : 'Needs improvement'}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
+                        <main role="main">
+                            {cravingLog.length === 0 ? (
+                                <div className="bg-white rounded-xl p-8 shadow-lg text-center">
+                                    <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center" aria-hidden="true">
+                                        <InsightsIcon className="w-8 h-8 text-gray-400" />
+                                    </div>
+                                    <h2 className="text-lg font-semibold text-gray-800 mb-2">No data yet</h2>
+                                    <p className="text-gray-600 mb-4">Complete a few craving assessments to see your personalized insights and patterns.</p>
+                                    <button
+                                        onClick={onStartCravingCheck}
+                                        className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-6 rounded-xl transition-all card-hover focus-visible"
+                                    >
+                                        Start Your First Assessment
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-6">
+                                    {smartInsight && (
+                                        <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-4 text-white" role="region" aria-label="Smart insight">
+                                            <div className="flex items-start">
+                                                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full mr-3 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+                                                    <LightbulbIcon className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <div className="text-sm font-semibold mb-1">Smart Insight</div>
+                                                    <div className="text-sm opacity-90">{smartInsight}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="bg-white rounded-xl p-6 shadow-lg" role="region" aria-label="Progress overview">
+                                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Progress Overview</h2>
+                                        <div className="grid grid-cols-3 gap-4 text-center">
+                                            <div>
+                                                <div className="text-2xl font-bold text-indigo-600" aria-label={`Current streak: ${currentStreak} days`}>{currentStreak}</div>
+                                                <div className="text-xs text-gray-600">Current streak</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-2xl font-bold text-green-600" aria-label={`Success rate: ${successRate} percent`}>{successRate}%</div>
+                                                <div className="text-xs text-gray-600">Success rate</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-2xl font-bold text-blue-600" aria-label={`Total tracked: ${cravingLog.length} cravings`}>{cravingLog.length}</div>
+                                                <div className="text-xs text-gray-600">Total tracked</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white rounded-xl p-6 shadow-lg" role="region" aria-label="Weekly cravings chart">
+                                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Weekly Cravings</h2>
+                                        <div className="space-y-3">
+                                            {Object.entries(dailyCounts).map(([dateStr, count]) => {
+                                                const date = new Date(dateStr);
+                                                const isToday = date.toDateString() === new Date().toDateString();
+                                                const dayName = isToday ? 'Today' : date.toLocaleDateString('en', { weekday: 'short', month: 'short', day: 'numeric' });
+                                                const maxCount = Math.max(...Object.values(dailyCounts), 1);
+                                                const percentage = (count / maxCount) * 100;
+                                                
+                                                return (
+                                                    <div key={dateStr} className="flex items-center justify-between">
+                                                        <span className={`text-sm font-medium ${isToday ? 'text-indigo-700' : 'text-gray-700'}`}>
+                                                            {dayName}
+                                                        </span>
+                                                        <div className="flex items-center">
+                                                            <div className="w-24 h-2 bg-gray-200 rounded-full mr-2">
+                                                                <div 
+                                                                    className={`h-2 rounded-full progress-bar ${isToday ? 'bg-indigo-600' : 'bg-indigo-400'}`}
+                                                                    style={{ width: `${percentage}%` }}
+                                                                    aria-label={`${count} cravings on ${dayName}`}
+                                                                ></div>
+                                                            </div>
+                                                            <span className="text-xs text-gray-500 w-8 text-right">{count}</span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white rounded-xl p-6 shadow-lg" role="region" aria-label="Craving times chart">
+                                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Craving Times</h2>
+                                        <div className="h-40 flex items-end justify-between px-2" role="img" aria-label="Bar chart showing craving frequency by time of day">
+                                            {['Morning', 'Afternoon', 'Evening', 'Night', 'Late Night'].map((timeOfDay) => {
+                                                const count = timeGroups[timeOfDay]?.length || 0;
+                                                const maxCount = Math.max(...Object.values(timeGroups).map(group => group?.length || 0), 1);
+                                                const height = (count / maxCount) * 100;
+                                                
+                                                return (
+                                                    <div key={timeOfDay} className="flex flex-col items-center">
+                                                        <div 
+                                                            className="chart-bar bg-gradient-to-t from-indigo-500 to-purple-500 w-8 mb-2"
+                                                            style={{ height: `${height}%`, minHeight: count > 0 ? '8px' : '0px' }}
+                                                            aria-label={`${count} cravings in ${timeOfDay}`}
+                                                        ></div>
+                                                        <span className="text-xs text-gray-600 text-center">{timeOfDay}</span>
+                                                        <span className="text-xs text-gray-400">{count}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {topTriggers.length > 0 && (
+                                        <div className="bg-white rounded-xl p-6 shadow-lg" role="region" aria-label="Common triggers">
+                                            <h2 className="text-lg font-semibold text-gray-800 mb-4">Common Triggers</h2>
+                                            <div className="space-y-3">
+                                                {topTriggers.map(([trigger, count], index) => (
+                                                    <div key={trigger} className="flex items-center justify-between">
+                                                        <div className="flex items-center">
+                                                            <div className={`w-3 h-3 rounded-full mr-3 ${
+                                                                index === 0 ? 'bg-red-400' :
+                                                                index === 1 ? 'bg-orange-400' :
+                                                                index === 2 ? 'bg-yellow-400' :
+                                                                'bg-gray-400'
+                                                            }`} aria-hidden="true"></div>
+                                                            <span className="text-sm text-gray-700">{trigger}</span>
+                                                        </div>
+                                                        <span className="text-sm font-medium text-gray-600" aria-label={`${count} occurrences`}>{count}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="bg-white rounded-xl p-6 shadow-lg" role="region" aria-label="Intensity levels chart">
+                                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Intensity Levels</h2>
+                                        <div className="space-y-2">
+                                            {[1, 2, 3, 4, 5].map(intensity => {
+                                                const count = intensityDist[intensity];
+                                                const total = Object.values(intensityDist).reduce((a, b) => a + b, 0);
+                                                const percentage = total > 0 ? (count / total) * 100 : 0;
+                                                
+                                                return (
+                                                    <div key={intensity} className="flex items-center">
+                                                        <span className="text-sm text-gray-600 w-16">Level {intensity}</span>
+                                                        <div className="flex-1 mx-3">
+                                                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                                                <div 
+                                                                    className={`h-2 rounded-full progress-bar ${
+                                                                        intensity <= 2 ? 'bg-green-400' :
+                                                                        intensity <= 3 ? 'bg-yellow-400' :
+                                                                        'bg-red-400'
+                                                                    }`}
+                                                                    style={{ width: `${percentage}%` }}
+                                                                    aria-label={`Level ${intensity}: ${count} cravings, ${percentage.toFixed(1)}% of total`}
+                                                                ></div>
+                                                            </div>
+                                                        </div>
+                                                        <span className="text-sm text-gray-500 w-8 text-right">{count}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </main>
+                    </div>
+                    
+                    <div className="pb-20"></div>
+                </div>
+            );
+        });
+
+        // Enhanced TextArea Component with Save + Blur pattern
+        const TextArea = memo(({ 
+            value, 
+            onChange, 
+            onBlur, 
+            placeholder, 
+            className = "", 
+            rows = 4,
+            id,
+            "aria-label": ariaLabel,
+            ...props 
+        }) => {
+            const [localValue, setLocalValue] = useState(value || '');
+
+            // Sync initial value
+            useEffect(() => {
+                setLocalValue(value || '');
+            }, [value]);
+
+            const handleChange = useCallback((e) => {
+                setLocalValue(e.target.value);
+            }, []);
+
+            const handleBlur = useCallback((e) => {
+                if (onBlur) {
+                    onBlur(localValue);
+                }
+            }, [localValue, onBlur]);
+
+            return (
+                <textarea
+                    id={id}
+                    value={localValue}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    placeholder={placeholder}
+                    className={className}
+                    rows={rows}
+                    aria-label={ariaLabel}
+                    {...props}
+                />
+            );
+        });
+
+        // Navigation Components
+        const BottomNav = memo(({ currentView, onNavigate }) => (
+            <nav className="bottom-nav" role="navigation" aria-label="Main navigation">
+                <div className="flex justify-around items-center px-6">
+                    <button 
+                        onClick={() => onNavigate('home')}
+                        className={`flex flex-col items-center py-2 transition-colors focus-visible ${
+                            currentView === 'home' ? 'text-blue-600' : 'text-gray-400'
+                        }`}
+                        aria-label="Go to home page"
+                        aria-current={currentView === 'home' ? 'page' : undefined}
+                    >
+                        <HomeIcon className="w-6 h-6" />
+                        <span className="text-xs mt-1 font-medium">Home</span>
+                    </button>
+                    
+                    <button 
+                        onClick={() => onNavigate('journal')}
+                        className={`flex flex-col items-center py-2 transition-colors focus-visible ${
+                            ['journal', 'journalEntry'].includes(currentView) ? 'text-blue-600' : 'text-gray-400'
+                        }`}
+                        aria-label="Go to journal"
+                        aria-current={['journal', 'journalEntry'].includes(currentView) ? 'page' : undefined}
+                    >
+                        <JournalIcon className="w-6 h-6" />
+                        <span className="text-xs mt-1 font-medium">Journal</span>
+                    </button>
+                    
+                    <button 
+                        onClick={() => onNavigate('insights')}
+                        className={`flex flex-col items-center py-2 transition-colors focus-visible ${
+                            ['insights', 'cravingCheck', 'cravingResult'].includes(currentView) ? 'text-blue-600' : 'text-gray-400'
+                        }`}
+                        aria-label="Go to insights and tracking"
+                        aria-current={['insights', 'cravingCheck', 'cravingResult'].includes(currentView) ? 'page' : undefined}
+                    >
+                        <InsightsIcon className="w-6 h-6" />
+                        <span className="text-xs mt-1 font-medium">Insights</span>
+                    </button>
+                </div>
+            </nav>
+        ));
+
+        const FloatingButton = memo(({ onClick }) => (
+            <button 
+                onClick={onClick}
+                className="floating-button scale-animation focus-visible"
+                title="Quick craving check"
+                aria-label="Start a quick craving assessment"
+            >
+                <PlusIcon className="w-6 h-6" />
+            </button>
+        ));
+
+        // Header Components
+        const AppHeader = memo(({ title, subtitle, icon: Icon, gradientClass, stats }) => (
+            <header className={`${gradientClass} px-6 pt-12 pb-8`} role="banner">
+                <div className="text-center text-white">
+                    <div className="w-20 h-20 glassmorphism-dark rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <Icon className="w-10 h-10 text-white" />
+                    </div>
+                    <h1 className="text-3xl font-bold mb-1">{title}</h1>
+                    {subtitle && <h2 className="text-xl font-medium mb-2">{subtitle}</h2>}
+                </div>
+
+                {stats && (
+                    <div className="glassmorphism rounded-2xl p-4 mt-6" role="region" aria-label="Quick statistics">
+                        <div className="grid grid-cols-3 gap-4 text-center text-white">
+                            {stats.map((stat, index) => (
+                                <div key={index}>
+                                    <div className="text-2xl font-bold" aria-label={stat.ariaLabel}>{stat.value}</div>
+                                    <div className="text-xs opacity-80">{stat.label}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </header>
+        ));
+
+        const NavigationHeader = memo(({ title, onBack, onAction, actionText }) => (
+            <header className="flex items-center justify-between mb-6">
+                <button 
+                    onClick={onBack}
+                    className="w-10 h-10 glassmorphism-dark rounded-full flex items-center justify-center focus-visible"
+                    aria-label="Go back"
+                >
+                    <ArrowLeftIcon className="w-5 h-5 text-white" />
+                </button>
+                <h1 className="text-xl font-bold text-white">{title}</h1>
+                {onAction ? (
+                    <button
+                        onClick={onAction}
+                        className="text-white font-semibold text-sm opacity-90 hover:opacity-100 focus-visible"
+                    >
+                        {actionText}
+                    </button>
+                ) : (
+                    <div className="w-10 h-10"></div>
+                )}
+            </header>
+        ));
+
+        // Home View Component
+        const HomeView = memo(({ 
+            cravingLog, 
+            onStartCravingCheck, 
+            onNavigate, 
+            getGreeting, 
+            getUserName, 
+            getCurrentStreak, 
+            getSuccessRate, 
+            getSmartInsight 
+        }) => {
+            const stats = useMemo(() => {
+                if (cravingLog.length === 0) return null;
+                return [
+                    {
+                        value: getCurrentStreak(),
+                        label: 'Current streak',
+                        ariaLabel: `Current streak: ${getCurrentStreak()} days`
+                    },
+                    {
+                        value: `${getSuccessRate()}%`,
+                        label: 'Success rate',
+                        ariaLabel: `Success rate: ${getSuccessRate()} percent`
+                    },
+                    {
+                        value: cravingLog.length,
+                        label: 'Total tracked',
+                        ariaLabel: `Total cravings tracked: ${cravingLog.length}`
+                    }
+                ];
+            }, [cravingLog, getCurrentStreak, getSuccessRate]);
+
+            const smartInsight = getSmartInsight();
+
+            return (
+                <div className="min-h-screen page-transition">
+                    <AppHeader
+                        title="MindFULL"
+                        subtitle={`${getGreeting()}, ${getUserName()}`}
+                        icon={HeartIcon}
+                        gradientClass="nature-gradient"
+                        stats={stats}
+                    />
+
+                    <main className="px-6 py-6 space-y-4" role="main">
+                        {smartInsight && (
+                            <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-4 text-white card-hover" role="region" aria-label="Smart insight">
+                                <div className="flex items-start">
+                                    <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full mr-3 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+                                        <LightbulbIcon className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <div className="text-sm font-semibold mb-1">Smart Insight</div>
+                                        <div className="text-sm opacity-90">{smartInsight}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="space-y-3" role="region" aria-label="Main actions">
+                            <ActionCard
+                                onClick={onStartCravingCheck}
+                                icon={AlertIcon}
+                                iconColor="bg-orange-500"
+                                title="Having a Craving?"
+                                subtitle="Let's explore it together"
+                                ariaLabel="Track a craving - most used feature"
+                            />
+
+                            <ActionCard
+                                onClick={() => onNavigate('hungerCheck')}
+                                icon={ClockIcon}
+                                iconColor="bg-blue-500"
+                                title="Check My Hunger"
+                                subtitle="Tune into your body signals"
+                                ariaLabel="Check your hunger level"
+                            />
+
+                            <ActionCard
+                                onClick={() => onNavigate('eating')}
+                                icon={HeartIcon}
+                                iconColor="bg-green-500"
+                                title="Start Mindful Eating"
+                                subtitle="Begin a guided eating session"
+                                ariaLabel="Start a guided mindful eating session"
+                            />
+
+                            <ActionCard
+                                onClick={() => onNavigate('insights')}
+                                icon={InsightsIcon}
+                                iconColor="bg-indigo-500"
+                                title="View My Patterns"
+                                subtitle="Discover your insights"
+                                ariaLabel="View your eating patterns and insights"
+                            />
+                        </div>
+                    </main>
+
+                    <div className="pb-20"></div>
+                </div>
+            );
+        });
+
+        const ActionCard = memo(({ onClick, icon: Icon, iconColor, title, subtitle, ariaLabel }) => (
+            <button
+                onClick={onClick}
+                className="w-full bg-white rounded-xl p-4 shadow-lg card-hover flex items-center focus-visible"
+                aria-label={ariaLabel}
+            >
+                <div className={`w-12 h-12 ${iconColor} rounded-full mr-4 flex items-center justify-center`} aria-hidden="true">
+                    <Icon className="w-6 h-6 text-white" />
+                </div>
+                <div className="text-left">
+                    <div className="font-semibold text-gray-800">{title}</div>
+                    <div className="text-sm text-gray-600">{subtitle}</div>
+                </div>
+            </button>
+        ));
+
+        // Journal Components
+        const JournalView = memo(({ 
+            journalEntries, 
+            onCreateEntry, 
+            onEditEntry, 
+            journalSearchTerm, 
+            onSearchChange,
+            getFilteredJournalEntries 
+        }) => (
+            <div className="min-h-screen page-transition">
+                <header className="purple-gradient px-6 pt-12 pb-8" role="banner">
+                    <div className="text-center text-white mb-6">
+                        <div className="w-20 h-20 glassmorphism-dark rounded-full mx-auto mb-4 flex items-center justify-center" aria-hidden="true">
+                            <JournalIcon className="w-10 h-10 text-white" />
+                        </div>
+                        <h1 className="text-2xl font-bold">Food Journal</h1>
+                        <p className="text-white text-opacity-80">Reflect on your eating experiences</p>
+                    </div>
+
+                    <button
+                        onClick={onCreateEntry}
+                        className="w-full glassmorphism-white text-gray-800 font-semibold py-4 px-6 rounded-xl shadow-lg transition-all card-hover flex items-center justify-center mb-6 focus-visible"
+                        aria-label="Create new journal entry"
+                    >
+                        <PenIcon className="w-5 h-5 mr-2" aria-hidden="true" />
+                        New Journal Entry
+                    </button>
+
+                    {journalEntries.length > 0 && (
+                        <div className="glassmorphism rounded-xl p-4">
+                            <div className="relative mb-4">
+                                <SearchIcon className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-white opacity-70" aria-hidden="true" />
+                                <TextInput
+                                    id="journal-search"
+                                    value={journalSearchTerm}
+                                    onBlur={onSearchChange}
+                                    placeholder="Search your entries..."
+                                    className="w-full pl-10 pr-4 py-2 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white"
+                                    aria-label="Search journal entries"
+                                />
+                            </div>
+                        </div>
+                    )}
+                </header>
+
+                <main className="px-6 py-6" role="main">
+                    {journalEntries.length === 0 ? (
+                        <EmptyJournalState onCreateEntry={onCreateEntry} />
+                    ) : (
+                        <JournalEntryList 
+                            entries={getFilteredJournalEntries()} 
+                            onEditEntry={onEditEntry} 
+                        />
+                    )}
+                </main>
+                
+                <div className="pb-20"></div>
+            </div>
+        ));
+
+        const EmptyJournalState = memo(({ onCreateEntry }) => (
+            <div className="bg-white rounded-xl p-8 shadow-lg text-center">
+                <div className="w-16 h-16 bg-purple-100 rounded-full mx-auto mb-4 flex items-center justify-center" aria-hidden="true">
+                    <JournalIcon className="w-8 h-8 text-purple-600" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-800 mb-2">Start Your Journey</h2>
+                <p className="text-gray-600 mb-4">Write your first journal entry to track your mindful eating experiences.</p>
+                <button
+                    onClick={onCreateEntry}
+                    className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-xl transition-all card-hover focus-visible"
+                >
+                    Write First Entry
+                </button>
+            </div>
+        ));
+
+        const JournalEntryList = memo(({ entries, onEditEntry }) => (
+            <div className="space-y-4" role="list" aria-label="Journal entries">
+                {entries.map((entry) => (
+                    <JournalEntryCard key={entry.id} entry={entry} onEdit={onEditEntry} />
+                ))}
+            </div>
+        ));
+
+        const JournalEntryCard = memo(({ entry, onEdit }) => (
+            <article className="bg-white rounded-xl p-4 shadow-lg journal-entry" role="listitem">
+                <div className="flex justify-between items-start mb-2">
+                    <div className="flex-1">
+                        <h3 className="font-semibold text-gray-800 text-lg">{entry.title || 'Untitled Entry'}</h3>
+                        <div className="flex items-center text-sm text-gray-500 mt-1">
+                            <time dateTime={new Date(entry.timestamp).toISOString()}>
+                                {new Date(entry.timestamp).toLocaleDateString()}
+                            </time>
+                            {entry.mood && (
+                                <>
+                                    <span className="mx-2" aria-hidden="true">•</span>
+                                    <span>{entry.mood}</span>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => onEdit(entry)}
+                        className="ml-4 text-gray-400 hover:text-gray-600 transition-colors focus-visible"
+                        aria-label={`Edit entry: ${entry.title || 'Untitled Entry'}`}
+                    >
+                        <PenIcon className="w-4 h-4" />
+                    </button>
+                </div>
+                <p className="text-gray-600 text-sm line-clamp-3">
+                    {entry.content.length > 150 
+                        ? entry.content.substring(0, 150) + '...' 
+                        : entry.content}
+                </p>
+            </article>
+        ));
+
+        // Journal Entry Form Component
+        const JournalEntryForm = memo(({ 
+            entry, 
+            onSave, 
+            onCancel, 
+            onDelete,
+            moodOptions 
+        }) => {
+            const [formData, setFormData] = useState({
+                title: entry.title || '',
+                content: entry.content || '',
+                mood: entry.mood || ''
+            });
+
+            const handleFieldChange = useCallback((field, value) => {
+                setFormData(prev => ({ ...prev, [field]: value }));
+            }, []);
+
+            const handleSave = useCallback(() => {
+                onSave(formData);
+            }, [formData, onSave]);
+
+            const handleMoodSelect = useCallback((mood) => {
+                setFormData(prev => ({ ...prev, mood }));
+            }, []);
+
+            return (
+                <div className="min-h-screen page-transition">
+                    <div className="purple-gradient px-6 pt-12 pb-8">
+                        <NavigationHeader
+                            title="Journal Entry"
+                            onBack={onCancel}
+                            onAction={handleSave}
+                            actionText="Save"
+                        />
+
+                        <main className="glassmorphism rounded-xl p-6 space-y-4">
+                            <div>
+                                <TextInput
+                                    id="journal-title"
+                                    value={formData.title}
+                                    onBlur={(value) => handleFieldChange('title', value)}
+                                    placeholder="Entry title..."
+                                    className="w-full p-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white font-semibold text-lg"
+                                    aria-label="Journal entry title"
+                                />
+                            </div>
+
+                            <div>
+                                <fieldset>
+                                    <legend className="block text-white text-sm font-medium mb-2 opacity-90">How are you feeling?</legend>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {moodOptions.map((mood) => (
+                                            <button
+                                                key={mood}
+                                                type="button"
+                                                onClick={() => handleMoodSelect(mood)}
+                                                className={`p-2 rounded-lg text-sm transition-all focus-visible ${
+                                                    formData.mood === mood
+                                                        ? 'bg-white bg-opacity-30 text-white border-2 border-white'
+                                                        : 'bg-white bg-opacity-10 text-white opacity-70 hover:opacity-100 border-2 border-transparent'
+                                                }`}
+                                                aria-pressed={formData.mood === mood}
+                                            >
+                                                {mood}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </fieldset>
+                            </div>
+
+                            <div>
+                                <TextArea
+                                    id="journal-content"
+                                    value={formData.content}
+                                    onBlur={(value) => handleFieldChange('content', value)}
+                                    placeholder="What happened today? How did your meals make you feel? What are you grateful for?"
+                                    className="w-full p-4 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white resize-none"
+                                    rows={8}
+                                    aria-label="Journal entry content"
+                                />
+                            </div>
+                        </main>
+
+                        <div className="flex gap-4 mt-6">
+                            <button
+                                onClick={onCancel}
+                                className="flex-1 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-all card-hover border border-white border-opacity-30 focus-visible"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                className="flex-1 glassmorphism-white text-gray-800 font-semibold py-4 px-6 rounded-xl shadow-lg transition-all card-hover focus-visible"
+                            >
+                                Save Entry
+                            </button>
+                        </div>
+
+                        {entry.id && (
+                            <button
+                                onClick={() => onDelete(entry.id)}
+                                className="w-full mt-4 bg-red-500 bg-opacity-20 hover:bg-opacity-30 text-white font-semibold py-3 px-6 rounded-xl transition-all card-hover border border-red-300 border-opacity-30 focus-visible"
+                            >
+                                Delete Entry
+                            </button>
+                        )}
+                    </div>
+                    
+                    <div className="pb-20"></div>
+                </div>
+            );
+        });
+
+        // Main App Component
+        const MindfulEatingCoach = () => {
+            // Core state
+            const [currentView, setCurrentView] = useState('home');
+            const [hungerLevel, setHungerLevel] = useState(4);
+            const [isEating, setIsEating] = useState(false);
+            const [eatingStartTime, setEatingStartTime] = useState(null);
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [eatingResponses, setEatingResponses] = useState([]);
+            const [eatingNote, setEatingNote] = useState('');
+            const [cravingLog, setCravingLog] = useState([]);
+            const [journalEntries, setJournalEntries] = useState([]);
+            const [journalSearchTerm, setJournalSearchTerm] = useState('');
+            const [currentJournalEntry, setCurrentJournalEntry] = useState({
+                id: null,
+                title: '',
+                content: '',
+                mood: '',
+                timestamp: null
+            });
+            const [currentCravingData, setCurrentCravingData] = useState({
+                timestamp: null,
+                food: '',
+                emotions: [],
+                intensity: 3,
+                triggers: [],
+                triggerNotes: '',
+                outcome: ''
+            });
+
+            // Constants
+            const distractionActivities = useMemo(() => [
+                "Take 5 deep breaths",
+                "Drink a glass of water", 
+                "Go for a 2-minute walk",
+                "Listen to your favorite song",
+                "Do 10 jumping jacks",
+                "Text a friend",
+                "Write in a journal",
+                "Do a quick stretch",
+                "Look out the window",
+                "Practice gratitude - think of 3 things you're thankful for",
+                "Organize your desk or a small space",
+                "Take a few photos of something beautiful nearby"
+            ], []);
+
+            const mindfulEatingPrompts = useMemo(() => [
+                {
+                    text: "Take a moment to look at your food. Notice the colors, textures, and presentation.",
+                    responseType: "observation",
+                    placeholder: "What do you notice about your food?"
+                },
+                {
+                    text: "Take your first bite slowly. Chew thoroughly and notice the flavors.",
+                    responseType: "taste",
+                    placeholder: "How does it taste? What flavors do you notice?"
+                },
+                {
+                    text: "Put your utensils down between bites. How are you feeling?",
+                    responseType: "feeling",
+                    placeholder: "How are you feeling right now?"
+                },
+                {
+                    text: "Check in with your hunger level now. Are you still hungry?",
+                    responseType: "hunger",
+                    options: ["Very hungry", "Moderately hungry", "Slightly hungry", "Not hungry", "Getting full"]
+                },
+                {
+                    text: "Notice how your body feels. Are you getting satisfied?",
+                    responseType: "satisfaction",
+                    options: ["Still very hungry", "Still hungry", "Starting to feel satisfied", "Feeling satisfied", "Getting full"]
+                },
+                {
+                    text: "Take a sip of water. How does your body feel now?",
+                    responseType: "body",
+                    placeholder: "How does your body feel after the water?"
+                },
+                {
+                    text: "You're doing great! Keep eating slowly and mindfully.",
+                    responseType: "reflection",
+                    placeholder: "How is this mindful eating experience going for you?"
+                },
+                {
+                    text: "Final check: How satisfied do you feel right now?",
+                    responseType: "final",
+                    options: ["Still hungry", "Slightly satisfied", "Comfortably satisfied", "Very satisfied", "Too full"]
+                }
+            ], []);
+
+            const cravingQuestions = useMemo(() => [
+                {
+                    question: "What are you craving specifically?",
+                    type: "food",
+                    options: ["Something sweet (candy, dessert)", "Something salty/crunchy (chips, crackers)", "Something creamy/rich (ice cream, cheese)", "Comfort food (pizza, pasta)", "Caffeinated drinks (coffee, energy drinks)", "A full meal"],
+                    insight: "Specific cravings often reveal emotional needs rather than hunger."
+                },
+                {
+                    question: "How intense is this craving right now?",
+                    type: "intensity", 
+                    useSlider: true,
+                    insight: "Intense cravings are more likely to be emotional rather than physical."
+                },
+                {
+                    question: "What emotions are you feeling right now?",
+                    type: "emotions",
+                    multiSelect: true,
+                    options: ["Stressed", "Anxious", "Bored", "Sad", "Lonely", "Tired", "Frustrated", "Happy", "Excited", "Overwhelmed", "Angry", "Procrastinating", "Neutral"],
+                    insight: "Identifying emotions helps recognize patterns in emotional eating."
+                },
+                {
+                    question: "When did you last eat a full meal?",
+                    type: "timing",
+                    options: ["Less than 2 hours ago", "2-3 hours ago", "3-4 hours ago", "4-6 hours ago", "More than 6 hours ago"],
+                    insight: "If it's been more than 3-4 hours, this might be real hunger!"
+                },
+                {
+                    question: "What might have triggered this craving?",
+                    type: "triggers",
+                    multiSelect: true,
+                    options: ["Saw food/ad", "Smelled food", "Work stress", "Relationship issue", "Fatigue", "Habit/routine", "Social situation", "Physical discomfort", "Procrastination", "Celebration/reward", "Nothing specific"],
+                    insight: "Understanding triggers helps you prepare for and manage future cravings."
+                }
+            ], []);
+
+            const moodOptions = useMemo(() => ["😊 Happy", "😌 Calm", "🤔 Thoughtful", "😟 Anxious", "😢 Sad", "😴 Tired", "🔥 Energized", "😠 Frustrated", "🥰 Grateful", "😐 Neutral"], []);
+
+            // localStorage utilities with error handling
+            const saveToStorage = useCallback((key, data) => {
+                try {
+                    localStorage.setItem(key, JSON.stringify(data));
+                } catch (error) {
+                    console.warn(`Failed to save ${key} to localStorage:`, error);
+                }
+            }, []);
+
+            const loadFromStorage = useCallback((key, defaultValue = null) => {
+                try {
+                    const stored = localStorage.getItem(key);
+                    return stored ? JSON.parse(stored) : defaultValue;
+                } catch (error) {
+                    console.warn(`Failed to load ${key} from localStorage:`, error);
+                    return defaultValue;
+                }
+            }, []);
+
+            const clearAllData = useCallback(() => {
+                try {
+                    localStorage.removeItem('mindful-craving-log');
+                    localStorage.removeItem('mindful-journal-entries');
+                    setCravingLog([]);
+                    setJournalEntries([]);
+                } catch (error) {
+                    console.warn('Failed to clear data:', error);
+                }
+            }, []);
+
+            // Load data from localStorage on app initialization
+            useEffect(() => {
+                const savedCravingLog = loadFromStorage('mindful-craving-log', []);
+                const savedJournalEntries = loadFromStorage('mindful-journal-entries', []);
+                
+                // Parse timestamps back to Date objects for saved craving data
+                if (savedCravingLog && savedCravingLog.length > 0) {
+                    const parsedCravingLog = savedCravingLog.map(entry => ({
+                        ...entry,
+                        timestamp: new Date(entry.timestamp)
+                    }));
+                    setCravingLog(parsedCravingLog);
+                }
+                
+                // Parse timestamps back to Date objects for saved journal entries
+                if (savedJournalEntries && savedJournalEntries.length > 0) {
+                    const parsedJournalEntries = savedJournalEntries.map(entry => ({
+                        ...entry,
+                        timestamp: new Date(entry.timestamp)
+                    }));
+                    setJournalEntries(parsedJournalEntries);
+                }
+
+                // Debug log for development (can be removed in production)
+                console.log('Loaded data:', {
+                    cravings: savedCravingLog?.length || 0,
+                    journalEntries: savedJournalEntries?.length || 0
+                });
+            }, [loadFromStorage]);
+
+            // Save craving log to localStorage whenever it changes (but not on initial load)
+            const [isInitialLoad, setIsInitialLoad] = useState(true);
+            useEffect(() => {
+                if (!isInitialLoad && cravingLog.length >= 0) {
+                    saveToStorage('mindful-craving-log', cravingLog);
+                }
+            }, [cravingLog, saveToStorage, isInitialLoad]);
+
+            // Save journal entries to localStorage whenever they change (but not on initial load)
+            useEffect(() => {
+                if (!isInitialLoad && journalEntries.length >= 0) {
+                    saveToStorage('mindful-journal-entries', journalEntries);
+                }
+            }, [journalEntries, saveToStorage, isInitialLoad]);
+
+            // Mark initial load as complete after first render
+            useEffect(() => {
+                const timer = setTimeout(() => setIsInitialLoad(false), 100);
+                return () => clearTimeout(timer);
+            }, []);
+
+            // Utility functions
+            const getGreeting = useCallback(() => {
+                const hour = new Date().getHours();
+                if (hour < 6) return 'Good night';
+                if (hour < 12) return 'Good morning';
+                if (hour < 17) return 'Good afternoon';
+                if (hour < 21) return 'Good evening';
+                return 'Good night';
+            }, []);
+
+            const getUserName = useCallback(() => {
+                return 'there';
+            }, []);
+
+            const getRandomActivities = useCallback(() => {
+                return distractionActivities
+                    .sort(() => Math.random() - 0.5)
+                    .slice(0, 4);
+            }, [distractionActivities]);
+
+            const getTimeOfDay = useCallback((date) => {
+                const hour = date.getHours();
+                if (hour < 6) return 'Late Night';
+                if (hour < 12) return 'Morning';
+                if (hour < 17) return 'Afternoon';
+                if (hour < 21) return 'Evening';
+                return 'Night';
+            }, []);
+
+            const getHungerLabel = useCallback((level) => {
+                const labels = {
+                    1: { 
+                        label: "Not hungry at all",
+                        sensation: "Comfortable and satisfied, no thoughts of food, stomach feels neutral"
+                    },
+                    2: { 
+                        label: "Slightly hungry",
+                        sensation: "First gentle awareness of stomach, could eat but don't need to yet"
+                    },
+                    3: { 
+                        label: "Moderately hungry",
+                        sensation: "Clear but comfortable hunger signals, stomach feels empty, ready to eat"
+                    },
+                    4: { 
+                        label: "Hungry",
+                        sensation: "Noticeable hunger pangs, stomach growling, actively thinking about food"
+                    },
+                    5: { 
+                        label: "Very hungry",
+                        sensation: "Strong hunger signals, difficulty concentrating, stomach feels quite empty"
+                    },
+                    6: { 
+                        label: "Extremely hungry",
+                        sensation: "Intense hunger, feeling irritable or shaky, urgent need for food"
+                    },
+                    7: { 
+                        label: "Starving",
+                        sensation: "Overwhelming hunger, lightheaded, hands may be trembling, can't focus on anything else"
+                    }
+                };
+                return labels[level] || labels[4];
+            }, []);
+
+            // Analytics functions
+            const getCravingsByTimeOfDay = useCallback(() => {
+                const timeGroups = {};
+                cravingLog.forEach(entry => {
+                    const timeOfDay = getTimeOfDay(new Date(entry.timestamp));
+                    if (!timeGroups[timeOfDay]) {
+                        timeGroups[timeOfDay] = [];
+                    }
+                    timeGroups[timeOfDay].push(entry);
+                });
+                return timeGroups;
+            }, [cravingLog, getTimeOfDay]);
+
+            const getDailyCravingCounts = useCallback(() => {
+                const counts = {};
+                const today = new Date();
+                
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    const dateStr = date.toDateString();
+                    counts[dateStr] = 0;
+                }
+                
+                cravingLog.forEach(entry => {
+                    const entryDate = new Date(entry.timestamp);
+                    const dateStr = entryDate.toDateString();
+                    if (counts.hasOwnProperty(dateStr)) {
+                        counts[dateStr]++;
+                    }
+                });
+                
+                return counts;
+            }, [cravingLog]);
+
+            const getIntensityDistribution = useCallback(() => {
+                const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+                cravingLog.forEach(entry => {
+                    const intensity = entry.intensity || 3;
+                    if (intensity >= 1 && intensity <= 5) {
+                        distribution[intensity]++;
+                    }
+                });
+                return distribution;
+            }, [cravingLog]);
+
+            const getMostCommonTriggers = useCallback(() => {
+                const triggerCounts = {};
+                cravingLog.forEach(entry => {
+                    entry.triggers?.forEach(trigger => {
+                        triggerCounts[trigger] = (triggerCounts[trigger] || 0) + 1;
+                    });
+                });
+                return Object.entries(triggerCounts)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 5);
+            }, [cravingLog]);
+
+            const getSuccessRate = useCallback(() => {
+                if (cravingLog.length === 0) return 0;
+                const successfulOutcomes = ['tried_distraction', 'recognized_real_hunger'];
+                const successful = cravingLog.filter(entry => 
+                    successfulOutcomes.includes(entry.outcome)
+                ).length;
+                return Math.round((successful / cravingLog.length) * 100);
+            }, [cravingLog]);
+
+            const getCurrentStreak = useCallback(() => {
+                if (cravingLog.length === 0) return 0;
+                const sortedLog = [...cravingLog].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                let streak = 0;
+                const successfulOutcomes = ['tried_distraction', 'recognized_real_hunger'];
+                
+                for (const entry of sortedLog) {
+                    if (successfulOutcomes.includes(entry.outcome)) {
+                        streak++;
+                    } else {
+                        break;
+                    }
+                }
+                return streak;
+            }, [cravingLog]);
+
+            const getSmartInsight = useCallback(() => {
+                if (cravingLog.length < 3) return null;
+                
+                const insights = [];
+                const triggerCounts = getMostCommonTriggers();
+                const timeGroups = getCravingsByTimeOfDay();
+                
+                if (triggerCounts.length > 0) {
+                    const topTrigger = triggerCounts[0][0];
+                    insights.push(`Your most common trigger is "${topTrigger}". Consider preparing alternative responses for these situations.`);
+                }
+                
+                const maxTimeGroup = Object.entries(timeGroups).reduce((a, b) => 
+                    a[1].length > b[1].length ? a : b
+                );
+                if (maxTimeGroup[1].length >= 2) {
+                    insights.push(`You tend to have more cravings in the ${maxTimeGroup[0].toLowerCase()}. Try scheduling a healthy snack or activity during this time.`);
+                }
+                
+                const intensityDist = getIntensityDistribution();
+                const highIntensity = intensityDist[4] + intensityDist[5];
+                const total = Object.values(intensityDist).reduce((a, b) => a + b, 0);
+                if (highIntensity / total > 0.6) {
+                    insights.push("Many of your cravings are high intensity. Try the 10-minute rule: wait 10 minutes before acting on strong cravings.");
+                }
+                
+                return insights[Math.floor(Math.random() * insights.length)];
+            }, [cravingLog, getMostCommonTriggers, getCravingsByTimeOfDay, getIntensityDistribution]);
+
+            // Journal functions
+            const saveJournalEntry = useCallback((formData) => {
+                if (!formData.title.trim() && !formData.content.trim()) return;
+                
+                const entry = {
+                    ...currentJournalEntry,
+                    ...formData,
+                    id: currentJournalEntry.id || Date.now(),
+                    timestamp: currentJournalEntry.timestamp || new Date()
+                };
+                
+                if (currentJournalEntry.id) {
+                    setJournalEntries(prev => 
+                        prev.map(e => e.id === entry.id ? entry : e)
+                    );
+                } else {
+                    setJournalEntries(prev => [entry, ...prev]);
+                }
+                
+                setCurrentJournalEntry({
+                    id: null,
+                    title: '',
+                    content: '',
+                    mood: '',
+                    timestamp: null
+                });
+                
+                setCurrentView('journal');
+            }, [currentJournalEntry]);
+
+            const editJournalEntry = useCallback((entry) => {
+                setCurrentJournalEntry(entry);
+                setCurrentView('journalEntry');
+            }, []);
+
+            const deleteJournalEntry = useCallback((entryId) => {
+                setJournalEntries(prev => prev.filter(e => e.id !== entryId));
+                setCurrentView('journal');
+            }, []);
+
+            const getFilteredJournalEntries = useCallback(() => {
+                if (!journalSearchTerm.trim()) return journalEntries;
+                
+                const searchLower = journalSearchTerm.toLowerCase();
+                return journalEntries.filter(entry => 
+                    entry.title.toLowerCase().includes(searchLower) ||
+                    entry.content.toLowerCase().includes(searchLower) ||
+                    entry.mood.toLowerCase().includes(searchLower)
+                );
+            }, [journalEntries, journalSearchTerm]);
+
+            // Action handlers
+            const handleHungerCheck = useCallback((level) => {
+                if (level <= 2) {
+                    setCurrentView('wait');
+                    setTimeout(() => {
+                        setCurrentView('home');
+                    }, 5000);
+                } else {
+                    setCurrentView('readyToEat');
+                }
+            }, []);
+
+            const startEating = useCallback(() => {
+                setIsEating(true);
+                setEatingStartTime(Date.now());
+                setCurrentView('eating');
+                setCurrentQuestion(0);
+                setEatingResponses([]);
+            }, []);
+
+            const nextEatingPrompt = useCallback((response) => {
+                if (response) {
+                    const newResponses = [...eatingResponses];
+                    newResponses[currentQuestion] = response;
+                    setEatingResponses(newResponses);
+                }
+                
+                if (currentQuestion < mindfulEatingPrompts.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                } else {
+                    setCurrentView('eatingComplete');
+                }
+            }, [eatingResponses, currentQuestion, mindfulEatingPrompts.length]);
+
+            const previousEatingPrompt = useCallback(() => {
+                if (currentQuestion > 0) {
+                    setCurrentQuestion(currentQuestion - 1);
+                }
+            }, [currentQuestion]);
+
+            const completeEating = useCallback((note) => {
+                setEatingNote(note);
+                setCurrentView('home');
+                setIsEating(false);
+                setEatingStartTime(null);
+                setEatingResponses([]);
+                setCurrentQuestion(0);
+            }, []);
+
+            const startCravingCheck = useCallback(() => {
+                setCurrentView('cravingCheck');
+                setCurrentQuestion(0);
+                setCurrentCravingData({
+                    timestamp: new Date(),
+                    food: '',
+                    emotions: [],
+                    intensity: 3,
+                    triggers: [],
+                    triggerNotes: '',
+                    outcome: ''
+                });
+            }, []);
+
+            const nextCravingQuestion = useCallback((selectedOption = null) => {
+                if (selectedOption) {
+                    const questionType = cravingQuestions[currentQuestion].type;
+                    const updatedData = { ...currentCravingData };
+                    
+                    if (cravingQuestions[currentQuestion].multiSelect) {
+                        if (!updatedData[questionType].includes(selectedOption)) {
+                            updatedData[questionType] = [...updatedData[questionType], selectedOption];
+                        }
+                    } else {
+                        updatedData[questionType] = selectedOption;
+                    }
+                    
+                    setCurrentCravingData(updatedData);
+                }
+                
+                if (currentQuestion < cravingQuestions.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                } else {
+                    setCurrentView('cravingResult');
+                }
+            }, [currentQuestion, cravingQuestions, currentCravingData]);
+
+            const previousCravingQuestion = useCallback(() => {
+                if (currentQuestion > 0) {
+                    setCurrentQuestion(currentQuestion - 1);
+                } else {
+                    setCurrentView('home');
+                }
+            }, [currentQuestion]);
+
+            const logCravingOutcome = useCallback((outcome) => {
+                const newCravingEntry = {
+                    ...currentCravingData,
+                    outcome: outcome
+                };
+                const updatedCravingLog = [...cravingLog, newCravingEntry];
+                setCravingLog(updatedCravingLog);
+                // Immediately save to localStorage
+                saveToStorage('mindful-craving-log', updatedCravingLog);
+            }, [currentCravingData, cravingLog, saveToStorage]);
+
+            const navigateToView = useCallback((view) => {
+                setCurrentView(view);
+            }, []);
+
+            const createJournalEntry = useCallback(() => {
+                setCurrentJournalEntry({
+                    id: null,
+                    title: '',
+                    content: '',
+                    mood: '',
+                    timestamp: null
+                });
+                setCurrentView('journalEntry');
+            }, []);
+
+            // AI Insights function for craving patterns
+            const getAICravingInsight = useCallback(() => {
+                if (cravingLog.length < 2) return "We're learning about your patterns. Keep tracking for personalized insights!";
+                
+                const now = new Date();
+                const currentHour = now.getHours();
+                const currentDay = now.getDay(); // 0 = Sunday
+                const timeOfDay = getTimeOfDay(now);
+                
+                // Time-based patterns
+                const todaysCravings = cravingLog.filter(entry => {
+                    const entryDate = new Date(entry.timestamp);
+                    return entryDate.toDateString() === now.toDateString();
+                });
+                
+                const sameTimeOfDayCravings = cravingLog.filter(entry => {
+                    const entryTimeOfDay = getTimeOfDay(new Date(entry.timestamp));
+                    return entryTimeOfDay === timeOfDay;
+                });
+                
+                const sameDayOfWeekCravings = cravingLog.filter(entry => {
+                    const entryDay = new Date(entry.timestamp).getDay();
+                    return entryDay === currentDay;
+                });
+                
+                const insights = [];
+                
+                // Daily pattern
+                if (todaysCravings.length > 1) {
+                    insights.push(`This is your ${todaysCravings.length}${todaysCravings.length === 2 ? 'nd' : todaysCravings.length === 3 ? 'rd' : 'th'} craving today. Consider if you're getting enough nutrition earlier in the day.`);
+                }
+                
+                // Time of day pattern
+                if (sameTimeOfDayCravings.length >= 3) {
+                    const avgIntensity = (sameTimeOfDayCravings.reduce((sum, entry) => sum + (entry.intensity || 3), 0) / sameTimeOfDayCravings.length).toFixed(1);
+                    insights.push(`You often crave food in the ${timeOfDay.toLowerCase()} (${sameTimeOfDayCravings.length} times tracked). Your average ${timeOfDay.toLowerCase()} craving intensity is ${avgIntensity}/5.`);
+                }
+                
+                // Intensity comparison
+                const recentIntensity = currentCravingData.intensity;
+                const avgIntensity = cravingLog.reduce((sum, entry) => sum + (entry.intensity || 3), 0) / cravingLog.length;
+                if (recentIntensity > avgIntensity + 0.5) {
+                    insights.push(`This craving (${recentIntensity}/5) is stronger than your usual intensity (${avgIntensity.toFixed(1)}/5). Consider what might be different today.`);
+                } else if (recentIntensity < avgIntensity - 0.5) {
+                    insights.push(`Great! This craving (${recentIntensity}/5) is milder than your typical intensity (${avgIntensity.toFixed(1)}/5).`);
+                }
+                
+                // Day of week pattern
+                const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                if (sameDayOfWeekCravings.length >= 2) {
+                    insights.push(`${dayNames[currentDay]}s seem to be challenging for you - you've tracked ${sameDayOfWeekCravings.length} cravings on ${dayNames[currentDay]}s.`);
+                }
+                
+                // Food type pattern
+                const currentFoodType = currentCravingData.food;
+                const sameTypeCravings = cravingLog.filter(entry => entry.food === currentFoodType);
+                if (sameTypeCravings.length >= 2) {
+                    insights.push(`You've craved "${currentFoodType.toLowerCase()}" ${sameTypeCravings.length} times. This might indicate a pattern worth exploring.`);
+                }
+                
+                return insights.length > 0 ? insights[Math.floor(Math.random() * insights.length)] : "Keep tracking to discover your unique patterns!";
+            }, [cravingLog, currentCravingData, getTimeOfDay]);
+
+            // Enhanced action handlers with proper state management
+            const handleCravingIntensityChange = useCallback((intensity) => {
+                setCurrentCravingData(prev => ({ ...prev, intensity }));
+            }, []);
+
+            const handleCravingOptionToggle = useCallback((option) => {
+                const questionType = cravingQuestions[currentQuestion].type;
+                const updatedData = { ...currentCravingData };
+                
+                if (cravingQuestions[currentQuestion].multiSelect) {
+                    const currentOptions = updatedData[questionType] || [];
+                    if (currentOptions.includes(option)) {
+                        updatedData[questionType] = currentOptions.filter(item => item !== option);
+                    } else {
+                        updatedData[questionType] = [...currentOptions, option];
+                    }
+                } else {
+                    nextCravingQuestion(option);
+                    return;
+                }
+                
+                setCurrentCravingData(updatedData);
+            }, [currentQuestion, cravingQuestions, currentCravingData, nextCravingQuestion]);
+
+            const handleCravingTriggerNotes = useCallback((notes) => {
+                setCurrentCravingData(prev => ({ ...prev, triggerNotes: notes }));
+            }, []);
+
+            const handleSkipCravingToResults = useCallback(() => {
+                const newCravingEntry = {
+                    ...currentCravingData,
+                    outcome: 'completed_assessment'
+                };
+                const updatedCravingLog = [...cravingLog, newCravingEntry];
+                setCravingLog(updatedCravingLog);
+                // Immediately save to localStorage
+                saveToStorage('mindful-craving-log', updatedCravingLog);
+                setCurrentView('cravingResult');
+            }, [currentCravingData, cravingLog, saveToStorage]);
+
+            // Render main component with all views
+            return (
+                <div className="max-w-md mx-auto bg-white min-h-screen relative">
+                    {currentView === 'home' && (
+                        <>
+                            <HomeView
+                                cravingLog={cravingLog}
+                                onStartCravingCheck={startCravingCheck}
+                                onNavigate={navigateToView}
+                                getGreeting={getGreeting}
+                                getUserName={getUserName}
+                                getCurrentStreak={getCurrentStreak}
+                                getSuccessRate={getSuccessRate}
+                                getSmartInsight={getSmartInsight}
+                            />
+                            <BottomNav currentView={currentView} onNavigate={navigateToView} />
+                            <FloatingButton onClick={startCravingCheck} />
+                        </>
+                    )}
+                    
+                    {currentView === 'hungerCheck' && (
+                        <>
+                            <HungerCheckView
+                                hungerLevel={hungerLevel}
+                                onHungerChange={setHungerLevel}
+                                onContinue={handleHungerCheck}
+                                onBack={() => navigateToView('home')}
+                                getHungerLabel={getHungerLabel}
+                            />
+                            <BottomNav currentView={currentView} onNavigate={navigateToView} />
+                        </>
+                    )}
+
+                    {currentView === 'wait' && (
+                        <WaitView
+                            hungerLevel={hungerLevel}
+                            onReturnHome={() => navigateToView('home')}
+                        />
+                    )}
+
+                    {currentView === 'readyToEat' && (
+                        <ReadyToEatView
+                            hungerLevel={hungerLevel}
+                            onStartEating={startEating}
+                            onReturnHome={() => navigateToView('home')}
+                        />
+                    )}
+
+                    {currentView === 'eating' && (
+                        <>
+                            <EatingView
+                                currentQuestion={currentQuestion}
+                                mindfulEatingPrompts={mindfulEatingPrompts}
+                                eatingResponses={eatingResponses}
+                                onNext={nextEatingPrompt}
+                                onPrevious={previousEatingPrompt}
+                                onResponseSelect={(response) => nextEatingPrompt(response)}
+                            />
+                            <BottomNav currentView={currentView} onNavigate={navigateToView} />
+                        </>
+                    )}
+
+                    {currentView === 'eatingComplete' && (
+                        <>
+                            <EatingCompleteView onComplete={completeEating} />
+                            <BottomNav currentView={currentView} onNavigate={navigateToView} />
+                        </>
+                    )}
+
+                    {currentView === 'cravingCheck' && (
+                        <>
+                            <CravingCheckView
+                                currentQuestion={currentQuestion}
+                                cravingQuestions={cravingQuestions}
+                                currentCravingData={currentCravingData}
+                                onNext={nextCravingQuestion}
+                                onPrevious={previousCravingQuestion}
+                                onIntensityChange={handleCravingIntensityChange}
+                                onOptionToggle={handleCravingOptionToggle}
+                                onTriggerNotesChange={handleCravingTriggerNotes}
+                                onSkipToResults={handleSkipCravingToResults}
+                            />
+                            <BottomNav currentView={currentView} onNavigate={navigateToView} />
+                        </>
+                    )}
+
+                    {currentView === 'cravingResult' && (
+                        <>
+                            <CravingResultView
+                                currentCravingData={currentCravingData}
+                                getRandomActivities={getRandomActivities}
+                                getAICravingInsight={getAICravingInsight}
+                                onLogOutcome={logCravingOutcome}
+                                onNavigate={navigateToView}
+                            />
+                            <BottomNav currentView={currentView} onNavigate={navigateToView} />
+                        </>
+                    )}
+                    
+                    {currentView === 'journal' && (
+                        <>
+                            <JournalView
+                                journalEntries={journalEntries}
+                                onCreateEntry={createJournalEntry}
+                                onEditEntry={editJournalEntry}
+                                journalSearchTerm={journalSearchTerm}
+                                onSearchChange={setJournalSearchTerm}
+                                getFilteredJournalEntries={getFilteredJournalEntries}
+                            />
+                            <BottomNav currentView={currentView} onNavigate={navigateToView} />
+                            <FloatingButton onClick={startCravingCheck} />
+                        </>
+                    )}
+                    
+                    {currentView === 'journalEntry' && (
+                        <JournalEntryForm
+                            entry={currentJournalEntry}
+                            onSave={saveJournalEntry}
+                            onCancel={() => setCurrentView('journal')}
+                            onDelete={deleteJournalEntry}
+                            moodOptions={moodOptions}
+                        />
+                    )}
+
+                    {currentView === 'insights' && (
+                        <>
+                            <InsightsView
+                                cravingLog={cravingLog}
+                                onStartCravingCheck={startCravingCheck}
+                                onNavigate={navigateToView}
+                                getDailyCravingCounts={getDailyCravingCounts}
+                                getIntensityDistribution={getIntensityDistribution}
+                                getCravingsByTimeOfDay={getCravingsByTimeOfDay}
+                                getMostCommonTriggers={getMostCommonTriggers}
+                                getSuccessRate={getSuccessRate}
+                                getCurrentStreak={getCurrentStreak}
+                                getSmartInsight={getSmartInsight}
+                                getTimeOfDay={getTimeOfDay}
+                            />
+                            <BottomNav currentView={currentView} onNavigate={navigateToView} />
+                            <FloatingButton onClick={startCravingCheck} />
+                        </>
+                    )}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<MindfulEatingCoach />, document.getElementById('root'));
+    </script>
+</body>
+</html>
